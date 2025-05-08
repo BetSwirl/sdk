@@ -1,0 +1,54 @@
+name: Deploy Storybook
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./examples/mini-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --ignore-workspace
+
+      - name: Build Storybook
+        run: pnpm build-storybook
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: examples/mini-app/storybook-static/
+          retention-days: 30
+
+      - name: Run Ansible playbook
+        uses: dawidd6/action-ansible-playbook@v3
+        with:
+          playbook: .github/ansible/deploy.yml
+          directory: ./examples/mini-app
+          configuration: |
+            [defaults]
+            callbacks_enabled = ansible.posix.profile_tasks, ansible.posix.timer
+            stdout_callback = yaml
+            host_key_checking = False
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          inventory: |
+            [webservers]
+            ${{ vars.DEPLOY_HOST }}
+          known_hosts: ${{ vars.KNOWN_HOSTS }}
+          options: |
+            -u ${{ vars.DEPLOY_USER }}
+            -v

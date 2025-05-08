@@ -1,0 +1,16 @@
+---
+- hosts: webservers
+  tasks:
+    - name: Copy dist files
+      synchronize:
+        src: storybook-static
+        dest: /var/www/betswirl-sdk/storybook-static
+        delete: yes
+        archive: no
+        recursive: yes
+        rsync_opts:
+          - "--no-perms"
+          - "--no-owner"
+          - "--no-group"
+          - "--no-times"
+          - "--compress"
