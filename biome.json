@@ -12,7 +12,8 @@
       "node_modules/**/*",
       ".turbo/**/*",
       "**/tsconfig*.json",
-      "**/documents/**/*.ts"
+      "**/documents/**/*.ts",
+      "examples/mini-app/**/*"
     ]
   },
   "formatter": {
