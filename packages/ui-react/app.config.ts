@@ -4,7 +4,7 @@ const DEFAULT_URL = "http://localhost:5173"
 const DEFAULT_PORT = 5173
 
 if (!process.env.BASE_URL) {
-  console.warn("WARNING: BASE_URL is not set in environment variables!")
+  console.warn("⚠️  WARNING: BASE_URL is not set in environment variables!")
 }
 
 const baseUrl = process.env.BASE_URL || DEFAULT_URL
@@ -21,9 +21,4 @@ console.log("Base URL: ", baseUrl)
 export const config = {
   baseUrl,
   server,
-  test: {
-    seedPhrase:
-      process.env.SEED_PHRASE || "test test test test test test test test test test test junk",
-    walletPassword: process.env.WALLET_PASSWORD || "Tester@1234",
-  },
 }

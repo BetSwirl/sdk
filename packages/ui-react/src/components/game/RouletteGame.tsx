@@ -5,6 +5,7 @@ import {
   Roulette,
   RouletteNumber,
 } from "@betswirl/sdk-core"
+import { useAccount } from "wagmi"
 import rouletteBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { GameDefinition } from "../../types/types"
@@ -28,6 +29,9 @@ const rouletteGameDefinition: GameDefinition<{
   getMultiplier: (choice) => Roulette.getMultiplier(choice),
   encodeInput: (choice) => Roulette.encodeInput(choice),
   getWinChancePercent: (choice) => Roulette.getWinChancePercent(choice),
+  formatDisplayResult: (rolledResult) => {
+    return rolledResult.rolled.toString()
+  },
 }
 
 export interface RouletteGameProps extends BaseGameProps {}
@@ -80,6 +84,8 @@ export function RouletteGame({
     isGamePaused,
   )
 
+  const { status: walletStatus } = useAccount()
+
   const selectedNumbers = (
     selection as { game: CASINO_GAME_TYPE.ROULETTE; choice: RouletteNumber[] }
   ).choice
@@ -110,6 +116,7 @@ export function RouletteGame({
             onNumbersChange={handleNumbersChange}
             multiplier={formattedNetMultiplier}
             isDisabled={isControlsDisabled}
+            token={token}
           />
         </GameFrame.GameControls>
         <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
@@ -120,6 +127,7 @@ export function RouletteGame({
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
+        isWalletConnecting={walletStatus === "connecting"}
         token={token}
         betStatus={betStatus}
         betAmount={betAmount}

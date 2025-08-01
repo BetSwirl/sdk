@@ -30,7 +30,7 @@ export default defineConfig({
 
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
-      name: "@betswirl/ui",
+      name: "@betswirl/ui-react",
     },
     rollupOptions: {
       external: (id) => {

@@ -6,6 +6,7 @@ export interface BaseGameProps extends React.HTMLAttributes<HTMLDivElement> {
   customTheme?: {
     "--primary"?: string
     "--play-btn-font"?: string
+    "--connect-btn-font"?: string
     "--game-window-overlay"?: string
   } & React.CSSProperties
   backgroundImage?: string
@@ -16,7 +17,7 @@ export interface GameControlsProps {
   isDisabled: boolean
 }
 
-export type GameVariant = "default" | "roulette" | "keno"
+export type GameVariant = "default" | "roulette" | "keno" | "wheel"
 
 export interface VariantConfig {
   card: {

@@ -1,13 +1,13 @@
 import { testWithSynpress } from "@synthetixio/synpress"
 import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
-import { getSecretsPassword } from "../test/helpers/getSecretsPassword"
+import { testConfig } from "../test/spec.config"
 import basicSetup from "../test/wallet-setup/basic.setup"
 
 const test = testWithSynpress(metaMaskFixtures(basicSetup))
 const { expect } = test
 
 test("check wallet balance on Base", async ({ context, page, metamaskPage, extensionId }) => {
-  const password = getSecretsPassword()
+  const password = testConfig.walletPassword
   const metamask = new MetaMask(context, metamaskPage, password, extensionId)
 
   // Navigate to app

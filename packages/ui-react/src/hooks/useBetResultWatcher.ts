@@ -55,7 +55,7 @@ function _extractEventData(
   decodedRollLog: DecodedEventLog,
   gameType: CASINO_GAME_TYPE,
 ): {
-  rolledData: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled
+  rolledData: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled | number
   payout: bigint
   totalBetAmount: bigint
   id: bigint
@@ -117,13 +117,27 @@ function _extractEventData(
         id: kenoRollArgs.id,
       }
     }
+    case CASINO_GAME_TYPE.WHEEL: {
+      const wheelRollArgs = decodedRollLog.args as unknown as {
+        id: bigint
+        payout: bigint
+        totalBetAmount: bigint
+        rolled: number[]
+      }
+      return {
+        rolledData: wheelRollArgs.rolled[0] || 0,
+        payout: wheelRollArgs.payout,
+        totalBetAmount: wheelRollArgs.totalBetAmount,
+        id: wheelRollArgs.id,
+      }
+    }
     default:
       throw new Error(`Unsupported game type for event extraction: ${gameType}`)
   }
 }
 
 function _decodeRolled(
-  rolled: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled,
+  rolled: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled | number,
   game: CASINO_GAME_TYPE,
 ): GameRolledResult {
   switch (game) {
@@ -153,24 +167,14 @@ function _decodeRolled(
         game: CASINO_GAME_TYPE.KENO,
         rolled: Keno.decodeRolled(rolled as KenoEncodedRolled),
       }
+    case CASINO_GAME_TYPE.WHEEL:
+      return {
+        game: CASINO_GAME_TYPE.WHEEL,
+        rolled: rolled as number,
+      }
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
       throw new Error(`Unsupported game type for decoding roll: ${game}`)
-  }
-}
-
-function formatRolledResult(rolled: GameRolledResult): string {
-  switch (rolled.game) {
-    case CASINO_GAME_TYPE.COINTOSS:
-      return rolled.rolled
-    case CASINO_GAME_TYPE.DICE:
-      return rolled.rolled.toString()
-    case CASINO_GAME_TYPE.ROULETTE:
-      return rolled.rolled.toString()
-    case CASINO_GAME_TYPE.KENO:
-      return rolled.rolled.join(", ")
-    default:
-      return ""
   }
 }
 
@@ -330,7 +334,7 @@ export function useBetResultWatcher({
         const result: GameResult = {
           ...casinoRolledBet,
           rolled: rolledResult,
-          formattedRolled: formatRolledResult(rolledResult),
+          formattedRolled: "", // It will be set later in game logic
         }
 
         logger.debug("processEventLogs: Bet event processed:", {

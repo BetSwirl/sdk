@@ -30,6 +30,7 @@ storybook-static
 .env
 .env.*
 !/.env.example
+.secrets
 
 tasks/
 
@@ -46,9 +47,6 @@ tasks/
 *.png
 *.jpg
 *.jpeg
-
-# Local secrets
-.secrets
 
 # Allow test directories (override root .gitignore)
 !test/

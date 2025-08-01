@@ -1,5 +1,13 @@
 import { testWithSynpress } from "@synthetixio/synpress"
 import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
+import {
+  closeAllDialogs,
+  extractBalance,
+  getGameResult,
+  TEST_BET_AMOUNT,
+  verifyCanPlayAgain,
+  waitForBettingStates,
+} from "../test/helpers/testHelpers"
 import basicSetup from "../test/wallet-setup/basic.setup"
 
 const test = testWithSynpress(metaMaskFixtures(basicSetup))
@@ -37,32 +45,39 @@ test.describe("Roulette Game", () => {
     const walletConnectedBtn = page.locator('[data-testid="ockConnectWallet_Connected"]')
     await expect(walletConnectedBtn).toBeVisible({ timeout: 10000 })
 
-    // Wait for app to initialize and potentially handle network switch
-    await page.waitForTimeout(3000)
+    // Switch to Base chain for ETH game
+    console.log("\n=== SWITCHING TO BASE CHAIN ===")
+    try {
+      await metamask.switchNetwork("Base")
+      console.log("Switched to Base network")
 
-    // Check if we need to switch to Base network
-    const switchNetworkButton = page.locator('button:has-text("Switch network")')
-    if (await switchNetworkButton.isVisible({ timeout: 5000 })) {
-      console.log("Switching to Base network...")
-      await switchNetworkButton.click()
-
-      // Handle MetaMask network switch approval
-      await metamask.approveSwitchNetwork()
-      await page.waitForTimeout(2000)
+      // Wait for UI to update
+      await page.waitForTimeout(3000)
+    } catch (error) {
+      console.log("Error switching to Base network:", error)
+      // Continue anyway - we might already be on Base
     }
 
-    // Check current balance and chain
+    // Check current balance
     console.log("\n=== CHECKING WALLET STATUS ===")
-    const balanceButton = page.locator('button:has-text("Balance:")').first()
-    await expect(balanceButton).toBeVisible({ timeout: 20000 })
 
-    const balanceText = await balanceButton.textContent()
-    console.log("Balance:", balanceText)
+    // Wait for balance to be visible
+    const balanceElement = page.locator("text=/Balance:/").first()
+    await expect(balanceElement).toBeVisible({ timeout: 20000 })
+
+    // Get initial balance
+    const balanceContainer = await balanceElement.locator("..").first()
+    const initialBalanceText = await balanceContainer.textContent()
+    console.log("Initial balance text:", initialBalanceText)
+
+    const initialBalance = extractBalance(initialBalanceText)
+    console.log("Initial balance amount:", initialBalance)
 
     // Check if wallet has sufficient balance
-    if (balanceText?.includes("0 ETH") || balanceText === "Balance: 0 ETH") {
+    if (initialBalance === 0) {
       console.log("\n⚠️  WALLET NEEDS FUNDING")
       console.log(`Please send at least 0.001 ETH to ${address} on Base chain`)
+      await page.screenshot({ path: "roulette-needs-funding.png", fullPage: true })
       throw new Error("Test wallet needs 0.001 ETH on Base chain to continue")
     }
 
@@ -72,61 +87,93 @@ test.describe("Roulette Game", () => {
     // Enter bet amount
     const betAmountInput = page.locator("#betAmount")
     await expect(betAmountInput).toBeVisible()
-    await betAmountInput.fill("0.0001")
-    console.log("Bet amount: 0.0001 ETH")
+    await betAmountInput.clear()
+    await betAmountInput.fill(TEST_BET_AMOUNT)
+    console.log(`Bet amount: ${TEST_BET_AMOUNT} ETH`)
 
-    // Place a bet on red
-    const redButton = page.locator('button[aria-label*="red"]').first()
-    if (await redButton.isVisible()) {
-      await redButton.click()
-      console.log("Placed bet on: Red")
+    // Place a bet - try different options
+    console.log("Looking for betting options...")
+
+    // Try to bet on "Even" which has better odds than a single number
+    const evenButton = page.locator('button:has-text("Even")').first()
+    if (await evenButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await evenButton.click()
+      console.log("Placed bet on: Even")
     } else {
-      // Alternative: bet on a specific number
-      const number17 = page.locator('button[aria-label*="17"]').first()
-      await number17.click()
-      console.log("Placed bet on: Number 17")
+      // Alternative: bet on a specific number (17 is red)
+      const number17 = page.locator("button").filter({ hasText: "17" }).first()
+      if (await number17.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await number17.click()
+        console.log("Placed bet on: Number 17")
+      } else {
+        // Fallback: click any red number
+        const redNumber = page.locator("button.bg-roulette-red").first()
+        await redNumber.click()
+        console.log("Placed bet on: Red number")
+      }
     }
 
-    // Place bet
-    const playButton = page.locator("button").filter({ hasText: "Place Bet" }).first()
-    await expect(playButton).toBeVisible()
+    // Look for the play button
+    console.log("Looking for play button...")
+    const playButton = page.getByRole("button", { name: "Place Bet" })
+    await expect(playButton).toBeVisible({ timeout: 10000 })
     await expect(playButton).toBeEnabled()
+
+    // Click play button
     await playButton.click()
-    console.log("Placing bet...")
+    console.log("Clicked Place Bet button")
 
     // Confirm transaction in MetaMask
     await metamask.confirmTransaction()
     console.log("Transaction confirmed in MetaMask")
 
-    // Wait for bet to be processed
-    await expect(playButton).toHaveText(/Bet rolling|Loading/i, { timeout: 30000 })
-    console.log("Bet is being processed...")
+    // Wait for bet to be processed through its various states
+    await waitForBettingStates(page)
 
-    // Wait for result (max 2 minutes)
-    await expect(playButton).not.toHaveText(/rolling|loading/i, { timeout: 120000 })
-    console.log("Bet completed!")
+    // Check for game result using the standardized approach
+    console.log("Checking for game result...")
+    const { isWin, rolled } = await getGameResult(page)
+    console.log(`\n🎰 ROULETTE RESULT: ${isWin ? "WON! �" : "Lost 😢"}, Rolled: ${rolled}`)
 
-    // Check result
-    const resultModal = page.locator('[role="dialog"]').filter({ hasText: /You (won|lost)/i })
-    const resultVisible = await resultModal.isVisible()
+    // Close bet history if it's open
+    await closeAllDialogs(page)
 
-    if (resultVisible) {
-      const resultText = await resultModal.textContent()
-      const isWin = resultText?.toLowerCase().includes("won")
-      console.log(`\n🎰 RESULT: ${isWin ? "WON! 🎉" : "Lost 😢"}`)
+    // Verify balance changed
+    console.log("\n=== VERIFYING BALANCE CHANGE ===")
+    const finalBalanceText = await balanceContainer.textContent()
+    const finalBalance = extractBalance(finalBalanceText)
+    console.log("Final balance:", finalBalance)
 
-      // Close result modal
-      const closeButton = resultModal
-        .locator('button[aria-label="Close"]')
-        .or(resultModal.locator('button:has-text("Close")'))
-      if (await closeButton.isVisible()) {
-        await closeButton.click()
-        console.log("Result modal closed")
+    // For small bets on mainnet, the balance might not visibly change due to rounding
+    const balanceChanged = Math.abs(finalBalance - initialBalance) > 0
+    if (!balanceChanged) {
+      console.log("Balance appears unchanged due to rounding, but bet was processed successfully")
+      // TODO #202: Test with BETS token and POL on Polygon to verify balance changes are visible with larger decimal precision
+    }
+
+    if (balanceChanged) {
+      if (isWin) {
+        // If won, balance should be higher
+        expect(finalBalance).toBeGreaterThan(initialBalance)
+      } else {
+        // If lost, balance should be lower
+        expect(finalBalance).toBeLessThan(initialBalance)
       }
+    } else {
+      // Balance unchanged due to rounding - just verify the game completed
+      console.log("Balance validation skipped due to rounding")
     }
 
     // Verify we can play again
-    await expect(playButton).toHaveText("Place Bet")
+    console.log("\n=== VERIFYING READY TO PLAY AGAIN ===")
+
+    // First ensure bet amount input is visible
+    await expect(betAmountInput).toBeVisible({ timeout: 5000 })
+
+    const canPlayAgain = await verifyCanPlayAgain(page, "roulette-cannot-play-again.png")
+    expect(canPlayAgain).toBe(true)
+
     console.log("\n✅ Roulette game test completed successfully!")
+    console.log(`Balance change: ${initialBalance} ETH → ${finalBalance} ETH`)
   })
 })

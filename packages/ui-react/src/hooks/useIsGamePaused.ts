@@ -5,6 +5,7 @@ import { useChain } from "../context/chainContext"
 
 type UseIsGamePausedProps = {
   game: CASINO_GAME_TYPE
+  query?: { enabled?: boolean }
 }
 
 /**
@@ -16,18 +17,24 @@ type UseIsGamePausedProps = {
  */
 export function useIsGamePaused(props: UseIsGamePausedProps) {
   const { appChainId } = useChain()
+  const isEnabled = props.query?.enabled ?? true
+
   const functionData = useMemo(() => {
+    if (!isEnabled || !props.game) {
+      return null
+    }
     return getGamePausedFunctionData(props.game, appChainId)
-  }, [props.game, appChainId])
+  }, [props.game, appChainId, isEnabled])
 
   const wagmiHook = useReadContract({
-    abi: functionData.data.abi,
-    address: functionData.data.to,
-    functionName: functionData.data.functionName,
-    args: functionData.data.args,
+    abi: functionData?.data.abi,
+    address: functionData?.data.to,
+    functionName: functionData?.data.functionName,
+    args: functionData?.data.args,
     chainId: appChainId,
     query: {
       initialData: false,
+      enabled: isEnabled && !!functionData,
     },
   })
 

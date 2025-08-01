@@ -42,6 +42,9 @@ export function GameResultWindow({ result, currency, className }: GameResultWind
 
   return (
     <div
+      role="alert"
+      data-testid="game-result-window"
+      data-result-type={result ? resultType : undefined}
       className={cn(
         "w-full h-full flex flex-col items-center justify-center px-[42px] absolute left-0 top-0 text-text-color z-20 transition-opacity duration-300",
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none",
@@ -69,7 +72,7 @@ export function GameResultWindow({ result, currency, className }: GameResultWind
               Payout: {result.formattedPayout}
               <span className="uppercase"> {currency}</span>
             </p>
-            <p className="text-[12px] leading-[167%] font-medium uppercase">
+            <p data-testid="rolled" className="text-[12px] leading-[167%] font-medium uppercase">
               Draw: {result.formattedRolled}
             </p>
           </div>

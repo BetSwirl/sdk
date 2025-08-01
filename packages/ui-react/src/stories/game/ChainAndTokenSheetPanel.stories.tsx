@@ -16,7 +16,7 @@ import { TokenIcon } from "../../components/ui/TokenIcon"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
-import { cn } from "../../lib/utils"
+import { cn, getTokenImage } from "../../lib/utils"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
 import type { Theme, TokenWithImage } from "../../types/types"
 
@@ -25,7 +25,7 @@ const USDC_TOKEN: TokenWithImage = {
   address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   symbol: "USDC",
   decimals: 6,
-  image: "https://www.betswirl.com/img/tokens/USDC.svg",
+  image: getTokenImage("USDC"),
 }
 
 interface PanelStoryWrapperProps {

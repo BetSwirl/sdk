@@ -9,3 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export function toLowerCase(address: string): Hex {
   return `0x${address.toLowerCase()}`
 }
+
+export function getTokenImage(symbol: string): string {
+  return `https://www.betswirl.com/img/tokens/${symbol.toUpperCase()}.svg`
+}

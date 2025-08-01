@@ -53,9 +53,7 @@ export function ChainAndTokenSheetPanel({
 
   const handleChainSelect = (chainId: CasinoChainId) => {
     switchAppChain(chainId)
-    // Let the token context handle resetting to native token with proper image
-    setSelectedToken(undefined)
-    setCurrentView("main")
+    setCurrentView("token")
   }
 
   return (
@@ -118,6 +116,7 @@ export function ChainAndTokenSheetPanel({
 
         {currentView === "token" && (
           <TokenSelectionView
+            key={`token-view-${appChainId}`}
             tokens={tokens}
             tokensLoading={tokensLoading}
             selectedToken={effectiveToken}
@@ -154,7 +153,7 @@ function ChainSelectionView({ currentChainId, onChainSelect, onBack }: ChainSele
       </div>
 
       <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 p-1">
           {availableChains.map((chain) => (
             <Button
               key={chain.viemChain.id}
@@ -216,7 +215,7 @@ function TokenSelectionView({
 
       <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb ">
         {/* biome-ignore lint/a11y/useSemanticElements: Native <select> cannot display token icons, balances, and loading states. Custom listbox provides rich UI while maintaining accessibility through ARIA roles. */}
-        <div className="flex flex-col gap-1" role="listbox" aria-label="Available tokens">
+        <div className="flex flex-col gap-1 p-1" role="listbox" aria-label="Available tokens">
           {tokensLoading ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
               Loading tokens...

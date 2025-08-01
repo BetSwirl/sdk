@@ -12,13 +12,11 @@ import {
   Token,
 } from "@betswirl/sdk-core"
 import { type UseQueryResult, useQuery } from "@tanstack/react-query"
-import React from "react"
 import { Address } from "viem"
 import { useAccount } from "wagmi"
-import { TokenIcon } from "../components/ui/TokenIcon"
 import { useTokenContext } from "../context/tokenContext"
 import { createLogger } from "../lib/logger"
-import { toLowerCase } from "../lib/utils"
+import { getTokenImage, toLowerCase } from "../lib/utils"
 import { HistoryEntryStatus, QueryParameter, TokenWithImage } from "../types/types"
 
 const logger = createLogger("useGameHistory")
@@ -47,7 +45,7 @@ export type GameHistoryEntry = {
   status: HistoryEntryStatus
   multiplier: string
   payoutAmount: string
-  payoutCurrencyIcon: React.ReactElement
+  payoutCurrencyToken: TokenWithImage
   timestamp: string
 }
 
@@ -124,8 +122,7 @@ export const useGameHistory: UseGameHistory = ({ gameType, filter, offset, limit
 
         const tokenWithImage: TokenWithImage = matchingToken || {
           ...bet.token,
-          // Use BetSwirl's token image URL pattern as fallback
-          image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
+          image: getTokenImage(bet.token.symbol),
         }
 
         return {
@@ -133,10 +130,7 @@ export const useGameHistory: UseGameHistory = ({ gameType, filter, offset, limit
           status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
           multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
           payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
-          payoutCurrencyIcon: React.createElement(TokenIcon, {
-            token: tokenWithImage,
-            size: 18,
-          }),
+          payoutCurrencyToken: tokenWithImage,
           timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
         }
       })

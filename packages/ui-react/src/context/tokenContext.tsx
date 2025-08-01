@@ -1,15 +1,17 @@
+import { chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import { useQueryClient } from "@tanstack/react-query"
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 import { type Address, zeroAddress } from "viem"
 import { useTokens } from "../hooks/useTokens"
+import { getTokenImage } from "../lib/utils"
 import { TokenWithImage } from "../types/types"
 import { useChain } from "./chainContext"
 
 const STORAGE_KEY = "betswirl-selected-token-address"
 
 interface TokenContextValue {
-  selectedToken: TokenWithImage | undefined
-  setSelectedToken: (token: TokenWithImage | undefined) => void
+  selectedToken: TokenWithImage
+  setSelectedToken: (token: TokenWithImage) => void
   activeTokens: TokenWithImage[]
   allTokens: TokenWithImage[]
   loading: boolean
@@ -36,6 +38,15 @@ function getStoredTokenAddress(chainId: number): Address | null {
   }
 }
 
+function getNativeToken(chainId: number): TokenWithImage {
+  const chain = chainById[chainId as keyof typeof chainById]
+  const nativeToken = chainNativeCurrencyToToken(chain.nativeCurrency)
+  return {
+    ...nativeToken,
+    image: getTokenImage(nativeToken.symbol),
+  }
+}
+
 function storeTokenAddress(address: Address, chainId: number): void {
   if (typeof window === "undefined") {
     return
@@ -51,7 +62,9 @@ function storeTokenAddress(address: Address, chainId: number): void {
 export function TokenProvider({ children }: TokenProviderProps) {
   const { appChainId } = useChain()
   const queryClient = useQueryClient()
-  const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
+  const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage>(() => {
+    return getNativeToken(appChainId)
+  })
   const [previousChainId, setPreviousChainId] = useState<number | undefined>(appChainId)
 
   // Cancel and remove token queries when chain changes
@@ -60,28 +73,23 @@ export function TokenProvider({ children }: TokenProviderProps) {
       // Chain has changed, cancel all in-flight queries and remove from cache
       queryClient.cancelQueries({ queryKey: ["casino-tokens"] })
       queryClient.removeQueries({ queryKey: ["casino-tokens"] })
+
       // Clear selected token immediately to prevent showing old chain's token
-      setSelectedTokenInternal(undefined)
+      setSelectedTokenInternal(getNativeToken(appChainId))
     }
     setPreviousChainId(appChainId)
   }, [appChainId, previousChainId, queryClient])
 
   const {
-    tokens: activeTokens,
-    loading: activeLoading,
-    error: activeError,
-  } = useTokens({ onlyActive: true })
-  const {
     tokens: allTokens,
-    loading: allLoading,
-    error: allError,
+    loading: tokensLoading,
+    error: tokenError,
   } = useTokens({ onlyActive: false })
 
-  const loading = activeLoading || allLoading
-  const error = activeError || allError
+  const activeTokens = allTokens.filter((token) => !token.paused)
 
   useEffect(() => {
-    if (activeLoading || activeTokens.length === 0) {
+    if (tokensLoading || activeTokens.length === 0) {
       return
     }
 
@@ -120,10 +128,10 @@ export function TokenProvider({ children }: TokenProviderProps) {
       console.warn(`No native token found for chain ${appChainId}`)
       return
     }
-    setSelectedTokenInternal(nativeToken)
-  }, [activeTokens, activeLoading, appChainId, selectedToken])
+    setSelectedTokenInternal(nativeToken ?? selectedToken)
+  }, [activeTokens, tokensLoading, appChainId, selectedToken])
 
-  const setSelectedToken = (token: TokenWithImage | undefined) => {
+  const setSelectedToken = (token: TokenWithImage) => {
     setSelectedTokenInternal(token)
     if (token) {
       storeTokenAddress(token.address, appChainId)
@@ -132,7 +140,14 @@ export function TokenProvider({ children }: TokenProviderProps) {
 
   return (
     <TokenContext.Provider
-      value={{ selectedToken, setSelectedToken, activeTokens, allTokens, loading, error }}
+      value={{
+        selectedToken,
+        setSelectedToken,
+        activeTokens,
+        allTokens,
+        loading: tokensLoading,
+        error: tokenError,
+      }}
     >
       {children}
     </TokenContext.Provider>

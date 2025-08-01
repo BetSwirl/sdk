@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react"
 import { HistorySheetPanel } from "../../components/game/HistorySheetPanel"
 import { Button } from "../../components/ui/button"
 import { Sheet, SheetTrigger } from "../../components/ui/sheet"
-import { TokenIcon } from "../../components/ui/TokenIcon"
 import { cn } from "../../lib/utils"
 import type { TokenWithImage } from "../../types/types"
 import { HistoryEntry, HistoryEntryStatus, Theme } from "../../types/types"
@@ -56,7 +55,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     status: HistoryEntryStatus.WonBet,
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
+    payoutCurrencyToken: ETH_TOKEN,
     timestamp: "~24h ago",
   },
   {
@@ -64,7 +63,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     status: HistoryEntryStatus.Busted,
     multiplier: 1.2,
     payoutAmount: 0.0,
-    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
+    payoutCurrencyToken: ETH_TOKEN,
     timestamp: "~2h ago",
   },
 ]
@@ -76,7 +75,7 @@ const mockHistoryDataExtended: HistoryEntry[] = [
     status: Math.random() > 0.5 ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
     multiplier: (Math.random() * 5 + 1).toFixed(2),
     payoutAmount: (Math.random() * 10).toFixed(4),
-    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
+    payoutCurrencyToken: ETH_TOKEN,
     timestamp: `~${i * 5 + 10}m ago`,
   })),
 ]

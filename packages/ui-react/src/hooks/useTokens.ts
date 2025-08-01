@@ -1,5 +1,5 @@
-import { CasinoToken, getCasinoTokens } from "@betswirl/sdk-core"
-import { WagmiBetSwirlWallet } from "@betswirl/wagmi-provider"
+import { CasinoToken } from "@betswirl/sdk-core"
+import { initWagmiBetSwirlClient } from "@betswirl/wagmi-provider"
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { type Address } from "viem"
@@ -7,7 +7,8 @@ import { useConfig } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger, type Logger } from "../lib/logger"
-import { QueryParameter, TokenWithImage } from "../types/types"
+import { getTokenImage } from "../lib/utils"
+import { CasinoTokenWithImage, QueryParameter, TokenWithImage } from "../types/types"
 import { type FilterTokensResult, filterTokensByAllowed } from "../utils/tokenUtils"
 
 const logger = createLogger("useTokens")
@@ -66,7 +67,7 @@ type UseTokensProps = {
 }
 
 type UseTokensResult = {
-  tokens: TokenWithImage[]
+  tokens: CasinoTokenWithImage[]
   loading: boolean
   error: Error | null
 }
@@ -74,8 +75,8 @@ type UseTokensResult = {
 /**
  * Hook to fetch casino tokens with optional filtering and validation
  *
- * @param onlyActive - Only return active (non-paused) tokens
- * @param query - Optional query parameters for React Query
+ * @param props.onlyActive - Only return active (non-paused) tokens
+ * @param props.query - Optional query parameters for React Query
  * @returns Object containing tokens array, loading state, and error
  *
  * The hook now includes enhanced validation for filteredTokens configuration:
@@ -106,19 +107,12 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
     queryKey: ["casino-tokens", appChainId, onlyActive],
     queryFn: async () => {
       // Create a modified wallet that uses the app chain ID
-      const wallet = new WagmiBetSwirlWallet(wagmiConfig)
-
-      // Store the original getChainId method
-      const originalGetChainId = wallet.getChainId.bind(wallet)
-
-      // Override getChainId to return the app chain
-      wallet.getChainId = () => appChainId
-
+      const wagmiClient = initWagmiBetSwirlClient(wagmiConfig)
       try {
-        return await getCasinoTokens(wallet, onlyActive)
+        const casinoTokens = await wagmiClient.getCasinoTokens(onlyActive, appChainId)
+        return casinoTokens
       } finally {
         // Restore original method
-        wallet.getChainId = originalGetChainId
       }
     },
     enabled: !!appChainId,
@@ -127,11 +121,11 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
     ...query,
   })
 
-  const tokens: TokenWithImage[] = useMemo(
+  const tokens: CasinoTokenWithImage[] = useMemo(
     () =>
       tokensQuery.data?.map((token) => ({
         ...token,
-        image: `https://www.betswirl.com/img/tokens/${token.symbol}.svg`,
+        image: getTokenImage(token.symbol),
       })) || [],
     [tokensQuery.data],
   )

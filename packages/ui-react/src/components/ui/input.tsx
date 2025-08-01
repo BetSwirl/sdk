@@ -26,7 +26,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "px-4 py-2",
             hasTokenInfo ? "pr-16 md:pr-20" : "",
             "text-base placeholder:text-muted-foreground",
-            "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0",
+            "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary",
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}
           ref={ref}

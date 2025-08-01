@@ -168,6 +168,7 @@ export const MysticForestDarkTheme: Story = {
     customTheme: {
       "--primary": "rgb(74 41 24)",
       "--play-btn-font": "rgb(225 159 31)",
+      "--connect-btn-font": "rgb(225 159 31)",
     } as React.CSSProperties,
     backgroundImage: gameBg6,
   },

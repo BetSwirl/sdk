@@ -38,7 +38,7 @@ const BUTTON_STYLES = {
     text: "text-keno-unselected-text",
     hover: "hover:bg-keno-unselected-hover-bg hover:border-primary hover:text-keno-unselected-text",
     focus:
-      "focus:bg-keno-unselected-hover-bg focus:border-primary focus:text-keno-unselected-text focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+      "focus:bg-keno-unselected-hover-bg focus:border-primary focus:text-keno-unselected-text focus:outline-none focus-visible:ring-0",
   },
   unselectedWinning: {
     background: "bg-keno-unselected-bg",
@@ -47,15 +47,14 @@ const BUTTON_STYLES = {
     hover:
       "hover:bg-keno-unselected-hover-bg hover:border-keno-winning-border hover:text-keno-unselected-text",
     focus:
-      "focus:bg-keno-unselected-hover-bg focus:border-keno-winning-border focus:text-keno-unselected-text focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+      "focus:bg-keno-unselected-hover-bg focus:border-keno-winning-border focus:text-keno-unselected-text focus:outline-none focus-visible:ring-0",
   },
   selected: {
     background: "bg-primary",
     border: "",
     text: "text-primary-foreground",
     hover: "hover:brightness-105 hover:bg-primary hover:text-primary-foreground",
-    focus:
-      "focus:brightness-105 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+    focus: "focus:brightness-105 focus:outline-none focus-visible:ring-0",
   },
   selectedWinning: {
     background: "bg-primary",
@@ -64,7 +63,7 @@ const BUTTON_STYLES = {
     hover:
       "hover:brightness-105 hover:bg-primary hover:text-primary-foreground hover:border-keno-winning-border",
     focus:
-      "focus:brightness-105 focus:border-keno-winning-border focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+      "focus:brightness-105 focus:border-keno-winning-border focus:outline-none focus-visible:ring-0",
   },
   disabled: "disabled:opacity-[0.72]",
   common: "w-[40px] h-[40px] p-0 text-[12px] font-medium rounded-[6px] shadow-none",
@@ -99,6 +98,8 @@ const NumberButton = React.memo<NumberButtonProps>(
         onClick={() => onClick(number)}
         disabled={isDisabled}
         className={buttonClasses}
+        aria-label={`Keno number ${number}`}
+        data-testid={`keno-number-${number}`}
       >
         {number}
       </Button>

@@ -1,50 +1,25 @@
-// Import necessary Synpress modules
-
-import fs from "node:fs"
-import path from "node:path"
+// Detailed debug setup with network switching
 import { defineWalletSetup } from "@synthetixio/synpress"
 import { MetaMask } from "@synthetixio/synpress/playwright"
-import { config } from "../../app.config"
+import { testConfig } from "../spec.config"
 
-// Try to read from .secrets file first, fallback to config
-function getCredentials() {
-  try {
-    const secretsPath = path.resolve(process.cwd(), "../../.secrets")
-    if (fs.existsSync(secretsPath)) {
-      const secretsContent = fs.readFileSync(secretsPath, "utf8")
-      const seedMatch = secretsContent.match(/SEED_PHRASE='([^']+)'/)
-      const passwordMatch = secretsContent.match(/WALLET_PASSWORD='([^']+)'/)
+const { seedPhrase: SEED_PHRASE, walletPassword: PASSWORD } = testConfig
 
-      if (seedMatch && passwordMatch) {
-        console.log("Using credentials from .secrets file")
-        return {
-          seedPhrase: seedMatch[1],
-          password: passwordMatch[1],
-        }
-      }
-    }
-  } catch (_error) {
-    // Ignore errors and use fallback
-  }
+console.log("Using test credentials from environment variables")
 
-  console.log("Using default test credentials")
-  return {
-    seedPhrase: config.test.seedPhrase,
-    password: config.test.walletPassword,
-  }
-}
-
-const { seedPhrase: SEED_PHRASE, password: PASSWORD } = getCredentials()
-
-// Define the basic wallet setup
 const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
-  // Create a new MetaMask instance
+  console.log("=== STARTING WALLET SETUP ===")
+
   const metamask = new MetaMask(context, walletPage, PASSWORD)
+  console.log("Created MetaMask instance")
 
   // Import the wallet using the seed phrase
+  console.log("Importing wallet...")
   await metamask.importWallet(SEED_PHRASE)
+  console.log("Wallet imported successfully")
 
-  // Add Base network with proper configuration
+  // Add Base network
+  console.log("Adding Base network...")
   try {
     await metamask.addNetwork({
       name: "Base",
@@ -53,12 +28,13 @@ const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
       symbol: "ETH",
       blockExplorerUrl: "https://basescan.org",
     })
-    console.log("Base network added successfully")
+    console.log("Base network added")
   } catch (error) {
-    console.log("Base network might already exist:", error)
+    console.log("Base network error:", error)
   }
 
   // Add Polygon network
+  console.log("Adding Polygon network...")
   try {
     await metamask.addNetwork({
       name: "Polygon",
@@ -67,12 +43,13 @@ const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
       symbol: "MATIC",
       blockExplorerUrl: "https://polygonscan.com",
     })
-    console.log("Polygon network added successfully")
+    console.log("Polygon network added")
   } catch (error) {
-    console.log("Polygon network might already exist:", error)
+    console.log("Polygon network error:", error)
   }
 
   // Add Avalanche network
+  console.log("Adding Avalanche network...")
   try {
     await metamask.addNetwork({
       name: "Avalanche",
@@ -81,18 +58,15 @@ const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
       symbol: "AVAX",
       blockExplorerUrl: "https://snowtrace.io",
     })
-    console.log("Avalanche network added successfully")
+    console.log("Avalanche network added")
   } catch (error) {
-    console.log("Avalanche network might already exist:", error)
+    console.log("Avalanche network error:", error)
   }
 
-  // Switch to Base network as default
-  try {
-    await metamask.switchNetwork("Base")
-    console.log("Switched to Base network")
-  } catch (error) {
-    console.log("Error switching to Base network:", error)
-  }
+  // Don't switch networks during setup - let the tests handle network switching
+  // The switchNetwork call in setup was causing the hanging issue
+
+  console.log("=== WALLET SETUP COMPLETED - All networks added ===")
 })
 
 // Export with walletPassword property for tests to access

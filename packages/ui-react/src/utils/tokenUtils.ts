@@ -1,9 +1,10 @@
+import { Token } from "@betswirl/sdk-core"
 import type { Token as OnchainKitToken } from "@coinbase/onchainkit/token"
 import { type Address } from "viem"
 import { TokenWithImage } from "../types/types"
 
-export interface FilterTokensResult {
-  filtered: TokenWithImage[]
+export interface FilterTokensResult<T extends Token = Token> {
+  filtered: T[]
   unmatched: Address[]
 }
 
@@ -35,10 +36,10 @@ function areAddressesEqual(address1: string, address2: string): boolean {
  * console.log(result.unmatched) // Addresses not found
  * ```
  */
-export function filterTokensByAllowed(
-  tokens: TokenWithImage[],
+export function filterTokensByAllowed<T extends Token>(
+  tokens: T[],
   allowedTokenAddresses: Address[],
-): FilterTokensResult {
+): FilterTokensResult<T> {
   const filteredTokens = tokens.filter((token) =>
     allowedTokenAddresses.some((allowedAddress) =>
       areAddressesEqual(token.address, allowedAddress),

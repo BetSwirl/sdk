@@ -146,6 +146,7 @@ const SheetBottomPanelContent = React.forwardRef<
         "focus:outline-none disabled:pointer-events-none bg-close-btn-hovered",
         "z-[60]",
         "-top-8",
+        "focus-visible:ring-1 focus-visible:ring-primary",
       )}
     >
       <XIcon className="h-5 w-5 text-close-btn-color" />

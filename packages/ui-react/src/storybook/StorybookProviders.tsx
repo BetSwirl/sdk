@@ -8,6 +8,7 @@ import { arbitrum, avalanche, base, polygon } from "wagmi/chains"
 import { BalanceProvider } from "../context/BalanceContext"
 import { BetSwirlSDKProvider } from "../context/BetSwirlSDKProvider"
 import { TokenProvider } from "../context/tokenContext"
+import { getTokenImage } from "../lib/utils"
 import type { TokenWithImage } from "../types/types"
 
 const CHAINS = [base, arbitrum, avalanche, polygon] as const
@@ -20,12 +21,12 @@ const DEGEN_TOKEN: TokenWithImage = {
   address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
   symbol: "DEGEN",
   decimals: 18,
-  image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
+  image: getTokenImage("DEGEN"),
 }
 
 const ETH_TOKEN: TokenWithImage = {
   ...chainNativeCurrencyToToken(DEFAULT_CHAIN.nativeCurrency),
-  image: "https://www.betswirl.com/img/tokens/ETH.svg",
+  image: getTokenImage("ETH"),
 }
 
 export const STORYBOOK_TOKENS = {

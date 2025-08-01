@@ -1,6 +1,7 @@
 import {
   CASINO_GAME_TYPE,
   type CasinoRolledBet,
+  CasinoToken,
   COINTOSS_FACE,
   CoinTossEncodedInput,
   DiceEncodedInput,
@@ -10,6 +11,8 @@ import {
   RouletteEncodedInput,
   RouletteNumber,
   type Token,
+  type WeightedGameConfiguration,
+  type WeightedGameEncodedInput,
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
 
@@ -34,18 +37,21 @@ export type GameChoice =
   | { game: CASINO_GAME_TYPE.DICE; choice: DiceNumber }
   | { game: CASINO_GAME_TYPE.ROULETTE; choice: RouletteNumber[] }
   | { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }
+  | { game: CASINO_GAME_TYPE.WHEEL; choice: WeightedGameConfiguration }
 
 export type GameRolledResult =
   | { game: CASINO_GAME_TYPE.COINTOSS; rolled: COINTOSS_FACE }
   | { game: CASINO_GAME_TYPE.DICE; rolled: DiceNumber }
   | { game: CASINO_GAME_TYPE.ROULETTE; rolled: RouletteNumber }
   | { game: CASINO_GAME_TYPE.KENO; rolled: KenoBall[] }
+  | { game: CASINO_GAME_TYPE.WHEEL; rolled: number }
 
 export type GameEncodedInput =
   | { game: CASINO_GAME_TYPE.COINTOSS; encodedInput: CoinTossEncodedInput }
   | { game: CASINO_GAME_TYPE.DICE; encodedInput: DiceEncodedInput }
   | { game: CASINO_GAME_TYPE.ROULETTE; encodedInput: RouletteEncodedInput }
   | { game: CASINO_GAME_TYPE.KENO; encodedInput: KenoEncodedInput }
+  | { game: CASINO_GAME_TYPE.WHEEL; encodedInput: WeightedGameEncodedInput }
 
 export type GameResult = CasinoRolledBet & {
   rolled: GameRolledResult
@@ -66,6 +72,10 @@ export interface TokenWithImage extends Token {
   image: string
 }
 
+export interface CasinoTokenWithImage extends CasinoToken {
+  image: string
+}
+
 export enum HistoryEntryStatus {
   WonBet = "Won bet",
   Busted = "Busted",
@@ -76,7 +86,7 @@ export interface HistoryEntry {
   status: HistoryEntryStatus
   multiplier: number | string
   payoutAmount: number | string
-  payoutCurrencyIcon: React.ReactElement
+  payoutCurrencyToken: TokenWithImage
   timestamp: string
 }
 
@@ -87,5 +97,6 @@ export interface GameDefinition<T extends GameChoice> {
   defaultSelection: T
   getMultiplier: (choice: T["choice"]) => number
   encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
-  getWinChancePercent?: (choice: T["choice"]) => number
+  getWinChancePercent?: (choice: T["choice"]) => number | number[]
+  formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
 }

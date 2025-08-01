@@ -45,10 +45,10 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
 
   // Get stored chain preference
   const getStoredChainId = useCallback((): CasinoChainId | null => {
-    if (typeof window === "undefined" || !address) return null
+    if (typeof window === "undefined") return null
 
     try {
-      const stored = localStorage.getItem(`${CHAIN_STORAGE_KEY}-${address}`)
+      const stored = localStorage.getItem(CHAIN_STORAGE_KEY)
       if (stored) {
         const chainId = Number(stored) as CasinoChainId
         // Validate stored chain is still in available chains
@@ -58,7 +58,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
       console.warn("Failed to read chain preference from localStorage:", error)
     }
     return null
-  }, [address, availableChainIds])
+  }, [availableChainIds])
 
   // Initialize chain ID from storage or use validated initial
   const [appChainId, setAppChainId] = useState<CasinoChainId>(() => {
@@ -77,6 +77,12 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
 
   const switchAppChain = useCallback(
     (chainId: CasinoChainId) => {
+      console.log("switchAppChain called:", {
+        targetChainId: chainId,
+        currentAppChainId: appChainId,
+        currentWalletChainId: walletChainId,
+      })
+
       // Validate chain is supported
       if (!availableChainIds.includes(chainId)) {
         console.warn(`Chain ${chainId} is not in supported chains`)
@@ -84,9 +90,9 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
       }
 
       // Save chain preference to localStorage
-      if (address && typeof window !== "undefined") {
+      if (typeof window !== "undefined") {
         try {
-          localStorage.setItem(`${CHAIN_STORAGE_KEY}-${address}`, chainId.toString())
+          localStorage.setItem(CHAIN_STORAGE_KEY, chainId.toString())
         } catch (error) {
           console.warn("Failed to save chain preference to localStorage:", error)
         }
@@ -95,8 +101,9 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
       // Set app chain immediately for better UX
       setAppChainId(chainId)
 
-      // Try to switch the wallet chain if connected
-      if (address && switchWalletChain) {
+      // Try to switch the wallet chain if connected and it's different
+      if (switchWalletChain && walletChainId !== chainId) {
+        console.log("Attempting to switch wallet chain to:", chainId)
         try {
           switchWalletChain({ chainId })
         } catch (error) {
@@ -106,18 +113,10 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
         }
       }
     },
-    [switchWalletChain, availableChainIds, address],
+    [switchWalletChain, availableChainIds, walletChainId, appChainId],
   )
 
   const appChain = useMemo(() => casinoChainById[appChainId], [appChainId])
-
-  // Try to switch the app chain automatically each time the wallet chain changes
-  useEffect(() => {
-    // Check if the wallet chain is supported by the authorized chains
-    if (walletChainId && availableChainIds.includes(walletChainId as CasinoChainId)) {
-      switchAppChain(walletChainId as CasinoChainId)
-    }
-  }, [walletChainId, switchAppChain, availableChainIds])
 
   // Clear chain preference when wallet disconnects
   useEffect(() => {

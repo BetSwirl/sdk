@@ -27,3 +27,4 @@ tsconfig.tsbuildinfo
 .npmrc
 
 .secrets
+.vercel

@@ -6,7 +6,8 @@ import { useBettingConfig } from "../context/configContext"
 
 type UseHouseEdgeProps = {
   game: CASINO_GAME_TYPE
-  token: Token
+  token?: Token
+  query?: { enabled?: boolean }
 }
 
 /**
@@ -32,19 +33,27 @@ type UseHouseEdgeProps = {
 export function useHouseEdge(props: UseHouseEdgeProps) {
   const { appChainId } = useChain()
   const { affiliate } = useBettingConfig()
+  const isEnabled = props.query?.enabled ?? true
+
   const functionData = useMemo(() => {
+    if (!isEnabled || !props.game || !props.token) {
+      return null
+    }
     return getAffiliateHouseEdgeFunctionData(props.game, props.token.address, affiliate, appChainId)
-  }, [props.game, props.token.address, affiliate, appChainId])
+  }, [props.game, props.token, affiliate, appChainId, isEnabled])
 
   const wagmiHook = useReadContract({
-    abi: functionData.data.abi,
-    address: functionData.data.to,
-    functionName: functionData.data.functionName,
-    args: functionData.data.args,
+    abi: functionData?.data.abi,
+    address: functionData?.data.to,
+    functionName: functionData?.data.functionName,
+    args: functionData?.data.args,
     chainId: appChainId,
+    query: {
+      enabled: isEnabled && !!functionData,
+    },
   })
 
-  const houseEdge = wagmiHook.data ?? 0
+  const houseEdge = Number(wagmiHook.data ?? 0n)
 
   const houseEdgePercent = useMemo(() => {
     return houseEdge / 100

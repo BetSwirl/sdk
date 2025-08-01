@@ -13,15 +13,25 @@ export const VARIANT_CONFIG: VariantConfigMap = {
   },
   roulette: {
     card: {
-      height: "h-[564px]",
+      height: "h-[527px]",
     },
     gameArea: {
-      height: "h-[212px]",
+      height: "h-[173px]",
       rounded: "rounded-[16px]",
       contentClass: "",
     },
   },
   keno: {
+    card: {
+      height: "h-[550px]",
+    },
+    gameArea: {
+      height: "h-[198px]",
+      rounded: "rounded-[16px]",
+      contentClass: "",
+    },
+  },
+  wheel: {
     card: {
       height: "h-[550px]",
     },

@@ -2,6 +2,22 @@ import { RouletteNumber } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
 import { RouletteGameControls } from "../../components/game/RouletteGameControls"
+import { TokenWithImage } from "../../types/types"
+
+// Mock tokens for stories
+const ETH_TOKEN: TokenWithImage = {
+  address: "0x0000000000000000000000000000000000000000",
+  symbol: "ETH",
+  decimals: 18,
+  image: "https://www.betswirl.com/img/tokens/ETH.svg",
+}
+
+const DEGEN_TOKEN: TokenWithImage = {
+  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
+  symbol: "DEGEN",
+  decimals: 18,
+  image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
+}
 
 const meta = {
   title: "Game/Controls/RouletteGameControls",
@@ -43,6 +59,19 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
+    token: {
+      control: { type: "radio" },
+      options: ["ETH", "DEGEN"],
+      mapping: {
+        ETH: ETH_TOKEN,
+        DEGEN: DEGEN_TOKEN,
+      },
+      description: "Token to display in chip icons",
+      table: {
+        type: { summary: "TokenWithImage" },
+        defaultValue: { summary: "ETH_TOKEN" },
+      },
+    },
   },
 } satisfies Meta<typeof RouletteGameControls>
 
@@ -54,11 +83,13 @@ function InteractiveRouletteGameControls({
   multiplier = 35.1,
   isDisabled = false,
   theme = "dark",
+  token = ETH_TOKEN,
 }: {
   initialSelectedNumbers?: RouletteNumber[]
   multiplier?: number
   isDisabled?: boolean
   theme?: "light" | "dark"
+  token?: TokenWithImage
 }) {
   const [selectedNumbers, setSelectedNumbers] = useState<RouletteNumber[]>(initialSelectedNumbers)
 
@@ -68,12 +99,13 @@ function InteractiveRouletteGameControls({
 
   return (
     <div className={theme}>
-      <div className="relative w-[304px] h-[206px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
+      <div className="relative w-[304px] h-[173px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
         <RouletteGameControls
           selectedNumbers={selectedNumbers}
           onNumbersChange={handleNumbersChange}
           multiplier={multiplier}
           isDisabled={isDisabled}
+          token={token}
         />
       </div>
     </div>
@@ -82,7 +114,9 @@ function InteractiveRouletteGameControls({
 
 export const LightThemeDefault: Story = {
   name: "Light Theme - Default (Empty)",
-  render: () => <InteractiveRouletteGameControls initialSelectedNumbers={[]} theme="light" />,
+  render: () => (
+    <InteractiveRouletteGameControls initialSelectedNumbers={[]} theme="light" token={ETH_TOKEN} />
+  ),
   args: {} as any,
   parameters: {
     backgrounds: { default: "light" },
@@ -98,7 +132,11 @@ export const LightThemeDefault: Story = {
 export const LightThemeMultipleNumbers: Story = {
   name: "Light Theme - Multiple Numbers",
   render: () => (
-    <InteractiveRouletteGameControls initialSelectedNumbers={[7, 14, 21, 28]} theme="light" />
+    <InteractiveRouletteGameControls
+      initialSelectedNumbers={[7, 14, 21, 28]}
+      theme="light"
+      token={DEGEN_TOKEN}
+    />
   ),
   args: {} as any,
   parameters: {
@@ -120,6 +158,7 @@ export const LightThemeDisabled: Story = {
       isDisabled={true}
       multiplier={8.75}
       theme="light"
+      token={DEGEN_TOKEN}
     />
   ),
   args: {} as any,
@@ -174,6 +213,7 @@ export const DarkThemeDisabled: Story = {
       isDisabled={true}
       multiplier={8.75}
       theme="dark"
+      token={DEGEN_TOKEN}
     />
   ),
   args: {} as any,

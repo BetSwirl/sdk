@@ -61,28 +61,32 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
   const nativeToken = tokens.find((token) => token.address === zeroAddress)
   const erc20Tokens = tokens.filter((token) => token.address !== zeroAddress)
 
-  // Fetch native token balance from wallet's current chain
+  // Use app chain for balance queries since we're showing tokens for the app chain
+  // This ensures balances match the displayed tokens even when wallet is on a different chain
+  const balanceChainId = appChainId
+
+  // Fetch native token balance from app chain
   const { data: nativeBalance, isLoading: nativeLoading } = useBalance({
     address: address as Hex,
-    chainId: walletChainId,
+    chainId: balanceChainId,
     query: {
       ...BALANCE_CACHE_CONFIG,
-      enabled: !!address && !!nativeToken && !!walletChainId,
+      enabled: !!address && !!nativeToken && !!balanceChainId,
     },
   })
 
-  // Batch fetch ERC20 balances from wallet's current chain
+  // Batch fetch ERC20 balances from app chain
   const { data: erc20Balances, isLoading: erc20Loading } = useReadContracts({
     contracts: erc20Tokens.map((token) => ({
       address: token.address as Hex,
       abi: erc20Abi,
       functionName: "balanceOf",
       args: [address as Hex],
-      chainId: walletChainId,
+      chainId: balanceChainId,
     })),
     query: {
       ...BALANCE_CACHE_CONFIG,
-      enabled: !!address && erc20Tokens.length > 0 && !!walletChainId,
+      enabled: !!address && erc20Tokens.length > 0 && !!balanceChainId,
     },
   })
 
@@ -103,15 +107,15 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
       )
     },
     ...BALANCE_CACHE_CONFIG,
-    enabled: !!address && tokens.length > 0 && !nativeLoading && !erc20Loading && !!walletChainId,
+    enabled: !!address && tokens.length > 0 && !nativeLoading && !erc20Loading && !!balanceChainId,
   })
 
-  // Clear balances when wallet chain switches
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need walletChainId to trigger when chain switches
+  // Clear balances when app chain switches since we're fetching from app chain
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Need appChainId to trigger when chain switches
   useEffect(() => {
     queryClient.removeQueries({ queryKey: ["balances"] })
     // Don't immediately refetch - let the query re-enable naturally when dependencies are ready
-  }, [walletChainId, queryClient])
+  }, [appChainId, queryClient])
 
   // Refetch balances when wallet connects/disconnects
   useEffect(() => {
@@ -125,7 +129,7 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
   const contextValue = useMemo<BalanceContextValue>(
     () => ({
       balances,
-      chainId: walletChainId || appChainId, // Use wallet chain for display, fallback to app chain
+      chainId: appChainId, // Use app chain since we're fetching balances from app chain
       isLoading,
       error: error as Error | null,
       refetch,
@@ -136,7 +140,7 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
         return formatRawAmount(balance, decimals, FORMAT_TYPE.PRECISE)
       },
     }),
-    [balances, walletChainId, appChainId, isLoading, error, refetch],
+    [balances, appChainId, isLoading, error, refetch],
   )
 
   return <BalanceContext.Provider value={contextValue}>{children}</BalanceContext.Provider>

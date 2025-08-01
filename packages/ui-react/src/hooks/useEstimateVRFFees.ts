@@ -16,7 +16,7 @@ import { useGasPrice } from "./useGasPrice"
 const VRF_ESTIMATION_GAS_LIMIT = 1000000n
 
 type UseEstimateVRFFeesProps = {
-  game: CASINO_GAME_TYPE
+  game: CASINO_GAME_TYPE | undefined
   token: Token
   betCount: number
 }
@@ -44,6 +44,7 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
   const { data: gasPriceData } = useGasPrice()
   const [vrfFees, setVrfFees] = useState<bigint>(0n)
   const functionData = useMemo(() => {
+    if (!props.game) return null
     return getChainlinkVrfCostFunctionData(
       props.game,
       props.token.address,
@@ -54,13 +55,13 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
 
   const vrfEstimateQuery = useCall({
     account: wrappedGasTokenById[appChainId], // Trick to avoid insufficient funds for gas error
-    to: functionData.data.to,
-    data: functionData.encodedData,
+    to: functionData?.data.to,
+    data: functionData?.encodedData,
     gasPrice: gasPriceData.optimalGasPrice,
     gas: VRF_ESTIMATION_GAS_LIMIT, // Trick to avoid insufficient funds for gas error
     chainId: appChainId,
     query: {
-      enabled: functionData.encodedData && gasPriceData.optimalGasPrice > 0n,
+      enabled: !!functionData && !!functionData.encodedData && gasPriceData.optimalGasPrice > 0n,
     },
   })
 

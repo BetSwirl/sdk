@@ -38,6 +38,7 @@ jobs:
           VITE_AVALANCHE_RPC_URL: ${{ secrets.VITE_AVALANCHE_RPC_URL }}
           VITE_ARBITRUM_RPC_URL: ${{ secrets.VITE_ARBITRUM_RPC_URL }}
           VITE_AFFILIATE_ADDRESS: ${{ vars.VITE_AFFILIATE_ADDRESS }}
+          VITE_STORYBOOK_VERSION: ${{ github.ref_name }}
         run: pnpm build-storybook
 
       - name: Upload build artifacts

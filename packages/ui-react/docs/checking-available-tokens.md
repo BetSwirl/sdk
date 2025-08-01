@@ -78,7 +78,7 @@ Example response from Base:
 Once you know which tokens are available, you can use them in your app:
 
 ```tsx
-import type { TokenWithImage } from '@betswirl/ui'
+import type { TokenWithImage } from '@betswirl/ui-react'
 import { base } from 'wagmi/chains'
 
 // Example token configuration
@@ -191,7 +191,7 @@ Check using the steps above as token availability may vary by network.
 - **Token images** follow the pattern: `https://www.betswirl.com/img/tokens/{SYMBOL}.svg`
 
 ### TypeScript Usage
-- Import `TokenWithImage` type from `@betswirl/ui` for proper type safety
+- Import `TokenWithImage` type from `@betswirl/ui-react` for proper type safety
 - Use `as const` for token addresses to ensure proper typing: `"0x..." as const`
 - The `bankrollToken` prop is **optional** - if not provided, users can select from all available tokens
 - The `filteredTokens` prop allows you to limit which tokens are available for selection
