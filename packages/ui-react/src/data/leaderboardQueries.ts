@@ -165,7 +165,7 @@ export interface FetchAllChainsLeaderboardsParams {
   publicClients: Map<CasinoChainId, PublicClient>
   supportedChains: CasinoChainId[]
   address?: Address
-  affiliate?: Address
+  getAffiliateForChain: (chainId: CasinoChainId) => Address
   showPartner: boolean
   testMode: boolean
 }
@@ -179,7 +179,7 @@ export async function fetchAndEnrichLeaderboardsForAllChains({
   publicClients,
   supportedChains,
   address,
-  affiliate,
+  getAffiliateForChain,
   showPartner,
   testMode,
 }: FetchAllChainsLeaderboardsParams): Promise<EnrichedLeaderboard[]> {
@@ -193,7 +193,7 @@ export async function fetchAndEnrichLeaderboardsForAllChains({
       publicClient,
       chainId,
       address,
-      affiliate,
+      affiliate: getAffiliateForChain(chainId),
       showPartner,
       testMode,
     })

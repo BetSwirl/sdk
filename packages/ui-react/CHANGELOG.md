@@ -1,5 +1,17 @@
 # @betswirl/ui-react
 
+## 0.2.2
+
+### Patch Changes
+
+- Make testMode prop optional with default false value
+
+## 0.2.0
+
+### Minor Changes
+
+- Added leaderboards with user rankings and freebet rewards system
+
 ## 0.1.18
 
 ### Patch Changes

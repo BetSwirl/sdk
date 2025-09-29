@@ -24,14 +24,14 @@ jobs:
         working-directory: ./packages/ui-react
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - run: rm ../../package.json ../../pnpm-lock.yaml
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '23'
 

@@ -5,7 +5,7 @@
     "url": "https://github.com/betswirl/sdk.git",
     "directory": "packages/ui-react"
   },
-  "version": "0.1.18",
+  "version": "0.2.2",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",

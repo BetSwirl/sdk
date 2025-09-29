@@ -36,8 +36,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { setSelectedToken } = useTokenContext()
-  const { affiliate, freebetsAffiliates, withExternalBankrollFreebets, filteredTokens, testMode } =
-    useBettingConfig()
+  const { affiliates, withExternalBankrollFreebets, filteredTokens, testMode } = useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
   // Track pending freebet selection for chain switches
@@ -51,10 +50,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     queryKey: [
       "freebets",
       accountAddress,
-      availableChainIds,
+      [...affiliates].sort((a, b) => a.localeCompare(b)),
       withExternalBankrollFreebets,
-      affiliate,
-      freebetsAffiliates,
       filteredTokens,
     ],
     queryFn: fetchFreebetsTokens,
@@ -195,15 +192,13 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     selectedFreebet,
     deselectFreebet,
     selectFreebetById,
-    pendingFreebetId, // Add to dependencies
+    pendingFreebetId,
   ])
 
   async function fetchFreebetsTokens(): Promise<SignedFreebet[]> {
     if (!accountAddress) {
       return []
     }
-
-    const affiliates = freebetsAffiliates || (affiliate ? [affiliate] : undefined)
 
     const allFreebets = await fetchFreebets(
       accountAddress,
