@@ -177,6 +177,48 @@ const meta = {
                 title: "🚀 Getting Started",
               },
             },
+          },
+          "ui-react": {
+            title: "UI React",
+            items: {
+              "getting-started": {
+                title: "🚀 Getting Started",
+              },
+              hooks: {
+                title: "Hooks",
+                items: {
+                  overview: {
+                    title: "Overview",
+                  },
+                  betting: {
+                    title: "Betting Hooks",
+                  },
+                  game: {
+                    title: "Game Hooks",
+                  },
+                  token: {
+                    title: "Token Hooks",
+                  },
+                  leaderboard: {
+                    title: "Leaderboard Hooks",
+                  },
+                },
+              },
+              components: {
+                title: "Components",
+                items: {
+                  games: {
+                    title: "Game Components",
+                  },
+                  ui: {
+                    title: "UI Components",
+                  },
+                },
+              },
+              providers: {
+                title: "Providers",
+              },
+            },
           }
         },
       },

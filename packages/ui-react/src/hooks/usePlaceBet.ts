@@ -38,6 +38,9 @@ export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
  * Handles the complete bet placement flow from transaction to result.
  * Manages transaction submission, VRF fee estimation, and result monitoring.
  *
+ * @internal This is a low-level hook used internally by useGameLogic.
+ * For most use cases, use useGameLogic instead which handles strategy creation automatically.
+ *
  * @param game - Type of casino game being played
  * @param token - Token being used for the bet (for display and balance purposes)
  * @param refetchBalance - Callback to refresh user balance after bet
@@ -47,25 +50,30 @@ export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
  *
  * @example
  * ```ts
- * const strategy = createPaidBetStrategy({
- *   token,
- *   affiliate,
- *   connectedAddress,
- *   chainId
- * })
+ * // This hook is used internally by useGameLogic
+ * // For typical usage, see useGameLogic documentation
+ *
+ * const betStrategy = useMemo(() => {
+ *   if (!address) return undefined
+ *
+ *   return createPaidBetStrategy({
+ *     token,
+ *     affiliate: getAffiliateForChain(chainId),
+ *     connectedAddress: address,
+ *     chainId
+ *   })
+ * }, [token, address, chainId])
  *
  * const { placeBet, betStatus, gameResult } = usePlaceBet(
  *   CASINO_GAME_TYPE.DICE,
  *   token,
  *   refetchBalance,
  *   gameDefinition,
- *   strategy
+ *   betStrategy
  * )
  *
- * // Place a bet
- * await placeBet(parseEther('0.1'), 3) // Bet 0.1 ETH on dice number 3
+ * await placeBet(parseEther('0.1'), 3)
  *
- * // Monitor status: pending -> loading -> rolling -> success
  * if (betStatus === 'success') {
  *   console.log('You', gameResult.isWin ? 'won' : 'lost')
  * }
