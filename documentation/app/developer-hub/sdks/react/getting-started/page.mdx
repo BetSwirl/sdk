@@ -1,2 +1,97 @@
 # Getting Started
-The React SDK is under development. Once the React SDK is published, this page will be updated.
+
+## What is @betswirl/ui-react?
+
+The **@betswirl/ui-react** is a complete React UI library for building casino dApps on top of the BetSwirl protocol. It provides ready-to-use game components, hooks for betting logic, and provider components for state management.
+
+### Key Benefits
+
+- **Ready-to-use game components** - CoinToss, Dice, Roulette, Keno, Wheel with built-in UI
+- **React hooks** - Complete betting logic, token management, leaderboards, and freebets
+- **Multi-chain support** - Works across Base, Polygon, Arbitrum, Avalanche, and BSC
+- **Customizable UI** - Built with Tailwind CSS and shadcn/ui components
+- **TypeScript support** - Full type safety for better developer experience
+
+### Consider alternatives if:
+- You need low-level protocol access → Use [@betswirl/sdk-core](/developer-hub/sdks/core/getting-started)
+- You're building a Node.js backend → Use [@betswirl/wagmi-provider](/developer-hub/sdks/wagmi-provider/getting-started)
+
+## Installation
+
+```bash
+npm i @betswirl/ui-react
+```
+
+## Quick Example
+
+Here's a minimal example of integrating a casino game:
+
+```tsx
+import { BetSwirlSDKProvider, TokenProvider, BalanceProvider, CoinTossGame } from '@betswirl/ui-react'
+import '@betswirl/ui-react/styles.css'
+import { OnchainKitProvider } from '@coinbase/onchainkit'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { WagmiProvider, createConfig, http } from 'wagmi'
+import { base } from 'wagmi/chains'
+
+const queryClient = new QueryClient()
+const config = createConfig({
+  chains: [base],
+  transports: { [base.id]: http() }
+})
+
+function App() {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <OnchainKitProvider chain={base}>
+          <BetSwirlSDKProvider
+            initialChainId={base.id}
+            supportedChains={[base.id]}
+            affiliate="0xYourAffiliateAddress"
+          >
+            <TokenProvider>
+              <BalanceProvider>
+                <CoinTossGame />
+              </BalanceProvider>
+            </TokenProvider>
+          </BetSwirlSDKProvider>
+        </OnchainKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  )
+}
+```
+
+> **Note**: For a complete step-by-step tutorial, see [Your React App in 1h](/developer-hub/quick-starts/react)
+
+## What's included?
+
+### Game Components
+- `<CoinTossGame />` - Heads or tails game
+- `<DiceGame />` - Roll the dice game
+- `<RouletteGame />` - European roulette
+- `<KenoGame />` - Number picking game
+- `<WheelGame />` - Wheel of fortune
+
+### Core Hooks
+- `usePlaceBet` - Place bets on games
+- `useBetRequirements` - Check betting limits and requirements
+- `useBetCalculations` - Calculate bet outcomes and payouts
+- `useTokens` - Manage supported tokens
+- `useLeaderboards` - Fetch and display leaderboards
+- `useGameLogic` - Core game state management
+
+### Provider Components
+- `<BetSwirlSDKProvider />` - Main SDK configuration
+- `<TokenProvider />` - Token state management
+- `<BalanceProvider />` - Balance tracking
+- `<FreebetsProvider />` - Freebet state
+- `<LeaderboardProvider />` - Leaderboard state
+
+## Next Steps
+
+- [Build your first React app with BetSwirl](/developer-hub/quick-starts/react) - Complete tutorial
+- [Explore game components](/developer-hub/sdks/react/components) - Detailed component documentation
+- [Learn about hooks](/developer-hub/sdks/react/hooks) - Hook API reference
+- [Check available tokens](/developer-hub/sdks/react/guides/checking-tokens) - Token configuration guide
