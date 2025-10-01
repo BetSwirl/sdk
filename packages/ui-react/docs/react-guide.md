@@ -222,8 +222,8 @@ type PlayNowEvent = {
 | `initialChainId` | `number` | **Required.** Chain ID to initialize the SDK with |
 | `supportedChains` | `number[]` | **Required.** Array of chain IDs to enable multi-chain support. Must include at least one supported chain ID |
 | `affiliate` | `string` | Optional. Your wallet address to receive affiliate commissions. If not provided, default affiliate will be used |
-| `bankrollToken` | `TokenWithImage` | Optional. Default token for betting. Must include `address`, `symbol`, `decimals`, and `image` properties. [See available tokens →](./checking-available-tokens.md) |
-| `filteredTokens` | `string[]` | Optional. Array of token addresses to limit which tokens are available for selection. If not provided, all supported tokens will be available. [Learn more about token filtering →](./checking-available-tokens.md#token-filtering) |
+| `bankrollToken` | `TokenWithImage` | Optional. Default token for betting. Must include `address`, `symbol`, `decimals`, and `image` properties. [See available tokens →](https://documentation-betswirl.vercel.app/developer-hub/demos/miniapp/checking-available-tokens) |
+| `filteredTokens` | `string[]` | Optional. Array of token addresses to limit which tokens are available for selection. If not provided, all supported tokens will be available. [Learn more about token filtering →](https://documentation-betswirl.vercel.app/developer-hub/demos/miniapp/checking-available-tokens#token-filtering) |
 
 ### Multi-Chain Support
 

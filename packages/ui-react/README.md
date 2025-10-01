@@ -20,7 +20,7 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 
 🪐 **Create a Farcaster Mini App with BetSwirl game**
 
-* 📖 [Farcaster Integration Guide](https://github.com/BetSwirl/sdk/blob/main/packages/ui-react/docs/farcaster-miniapp-guide.md)
+* 📖 [Farcaster Integration Guide](https://documentation-betswirl.vercel.app/developer-hub/demos/miniapp)
 * 🎮 [Live Demo](https://miniapp-ui-react-demo.vercel.app) - See it in action ([source code](https://github.com/BetSwirl/miniapp-ui-react-demo))
 
 ## Installation
