@@ -1,5 +1,11 @@
 # @betswirl/ui-react
 
+## 0.2.3
+
+### Patch Changes
+
+- Fix bet status check, simplify affiliate API
+
 ## 0.2.2
 
 ### Patch Changes
