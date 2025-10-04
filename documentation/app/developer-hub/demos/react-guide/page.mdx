@@ -1,36 +1,43 @@
 # React Integration Guide
 
-## Create Demo Project
+Build a Web3 casino with just a few steps! This guide will walk you through creating a casino application using BetSwirl's React UI library.
+
+**What you'll build:** A fully functional dice game with multi-chain support, custom theming, and background image - exactly like our [live demo](https://ui-react-demo.betswirl.com).
+
+**Time:** ~10 minutes
+
+## Step 1: Create Project
 
 ```shell
 # node --version
 # v24.2.0
 
 npm create vite@latest betswirl-ui-react-demo -- --template react-ts
-cd betswirl-ui-react-demo
-npm install
 ```
 
-## Verify Installation
+When prompted:
+- **Use rolldown-vite (Experimental)?** → Select **No**
+- **Install with npm and start now?** → Select **Yes**
+
+This will automatically install dependencies and start the dev server. Open http://localhost:5173 in your browser - you should see the default Vite + React welcome page.
+
+Stop the dev server (Ctrl+C) and navigate to the project directory:
 
 ```shell
-npm run dev
-# Open http://localhost:5173
+cd betswirl-ui-react-demo
 ```
 
-## Add BetSwirl
-
-### Install
+## Step 2: Install BetSwirl
 
 ```shell
 npm i @betswirl/ui-react
 ```
 
-Package: [npmjs.com/package/@betswirl/ui-react](https://www.npmjs.com/package/@betswirl/ui-react)
+Package: [@betswirl/ui-react on npm](https://www.npmjs.com/package/@betswirl/ui-react)
 
-### Update main.tsx
+## Step 3: Setup Providers
 
-Add all providers directly or create an AppProviders component:
+Replace the entire content of `src/main.tsx` with:
 
 ```tsx
 import { StrictMode } from 'react'
@@ -40,12 +47,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, type Hex } from 'viem'
 import { WagmiProvider, createConfig } from 'wagmi'
 import { base, polygon, arbitrum } from 'wagmi/chains'
-import { 
-  BalanceProvider, 
-  BetSwirlSDKProvider, 
-  FreebetsProvider, 
-  TokenProvider, 
-  type TokenWithImage 
+import {
+  BalanceProvider,
+  BetSwirlSDKProvider,
+  FreebetsProvider,
+  LeaderboardProvider,
+  TokenProvider,
+  type TokenWithImage
 } from '@betswirl/ui-react'
 import './index.css'
 import '@betswirl/ui-react/styles.css'
@@ -53,27 +61,19 @@ import App from './App.tsx'
 
 const queryClient = new QueryClient()
 
-// Create wagmi config
-// http() without parameters = use default public RPC from wagmi
-// http('your-url') = use your custom RPC
+// Use custom RPC if provided in .env, otherwise use default
+const baseRpc = import.meta.env.VITE_BASE_RPC_URL
+const polygonRpc = import.meta.env.VITE_POLYGON_RPC_URL
+const arbitrumRpc = import.meta.env.VITE_ARBITRUM_RPC_URL
+
 const config = createConfig({
   chains: [base, polygon, arbitrum],
   transports: {
-    [base.id]: http(),     // uses wagmi's default RPC for Base
-    [polygon.id]: http(),  // uses wagmi's default RPC for Polygon
-    [arbitrum.id]: http(), // uses wagmi's default RPC for Arbitrum
+    [base.id]: baseRpc ? http(baseRpc) : http(),
+    [polygon.id]: polygonRpc ? http(polygonRpc) : http(),
+    [arbitrum.id]: arbitrumRpc ? http(arbitrumRpc) : http(),
   },
 })
-
-// For production with custom RPCs from .env file:
-// const config = createConfig({
-//   chains: [base, polygon, arbitrum],
-//   transports: {
-//     [base.id]: http(import.meta.env.VITE_BASE_RPC_URL),
-//     [polygon.id]: http(import.meta.env.VITE_POLYGON_RPC_URL),
-//     [arbitrum.id]: http(import.meta.env.VITE_ARBITRUM_RPC_URL),
-//   },
-// })
 
 const onChainKitConfig: AppConfig = {
   wallet: {
@@ -101,6 +101,7 @@ const ALLOWED_TOKENS = [
   DEGEN_TOKEN.address,
   ETH_TOKEN.address,
   "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as Hex, // USDC
+  "0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5" as Hex, // BETS
 ]
 
 createRoot(document.getElementById('root')!).render(
@@ -117,7 +118,9 @@ createRoot(document.getElementById('root')!).render(
             <TokenProvider>
               <BalanceProvider>
                 <FreebetsProvider>
-                  <App />
+                  <LeaderboardProvider>
+                    <App />
+                  </LeaderboardProvider>
                 </FreebetsProvider>
               </BalanceProvider>
             </TokenProvider>
@@ -129,21 +132,305 @@ createRoot(document.getElementById('root')!).render(
 )
 ```
 
-This code uses default public RPCs from wagmi. No environment variables needed.
+**What's happening here:**
+- **Wagmi & React Query**: Manage blockchain connections and data fetching
+- **OnchainKit**: Provides wallet connection UI
+- **BetSwirl Providers**: Handle betting logic, token management, freebets, and leaderboards
+- **Multi-chain support**: Base, Polygon, and Arbitrum configured
+- **Custom RPCs**: Fallback to default public RPCs if env variables not set
+- **Token filtering**: Limit available tokens to DEGEN, ETH, USDC, and BETS
 
-### Add Game Component
+## Step 4: Add Game Component
 
-In `src/App.tsx`:
+Replace the entire content of `src/App.tsx` with:
+
+```tsx
+import {DiceGame} from '@betswirl/ui-react'
+
+function App() {
+    return (
+        <DiceGame
+            theme="dark"
+            customTheme={{
+                "--primary": "rgb(225 159 31)",
+                "--play-btn-font": "rgb(74 41 24)",
+            } as React.CSSProperties}
+            backgroundImage="/game-bg.png"
+        />
+    )
+}
+
+export default App
+```
+
+**What's happening here:**
+- **DiceGame component**: Fully functional dice game with betting panel
+- **Dark theme**: Dark mode interface
+- **Custom colors**: Gold primary color (`rgb(225 159 31)`) and dark brown button text
+- **Background image**: Will add in next step
+
+## Step 5: Add Background Images
+
+Download two background images - one for the page and one for the game component:
+
+1. **Download page background**: Right-click → [page-bg.png](https://raw.githubusercontent.com/BetSwirl/ui-react-demo/main/public/page-bg.png) → "Save image as..."
+2. **Download game background**: Right-click → [game-bg.png](https://raw.githubusercontent.com/BetSwirl/ui-react-demo/main/public/game-bg.png) → "Save image as..."
+3. **Save both images** to the `public/` folder:
+   ```
+   betswirl-ui-react-demo/
+   ├── public/
+   │   ├── page-bg.png   ← Background for entire page
+   │   └── game-bg.png   ← Background for game component
+   ├── src/
+   └── ...
+   ```
+
+4. **Add page background style** to `src/index.css`:
+
+Open `src/index.css` and add these styles to the `body` section (around line 25):
+
+```css
+body {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 328px;
+  min-height: 100vh;
+  background-image: url('/page-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#root {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+```
+
+**Note:**
+- `page-bg.png` = full page background (behind everything)
+- `game-bg.png` = game component background (behind betting panel and dice)
+
+## Step 6: Run Your Casino
+
+```shell
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173)
+
+You should see a dice game with gold accents on a dark background - exactly like the [live demo](https://ui-react-demo.betswirl.com).
+
+## Step 7: Push to GitHub
+
+Before deploying, you need to push your code to GitHub.
+
+**1. Initialize Git and commit your code:**
+
+```bash
+git init
+git add .
+git commit -m "feat: initial casino setup"
+```
+
+**2. Create a new repository on GitHub:**
+
+- Go to [github.com](https://github.com) and sign in
+- Click the **"+"** button in top right → **"New repository"**
+- Repository name: `my-casino-app` (or any name you prefer)
+- Make it **Private**
+- **Do not** initialize with README, .gitignore, or license
+- Click **"Create repository"**
+
+**3. Connect your local project to GitHub:**
+
+GitHub will show you commands after creating the repository. Copy and run them:
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/my-casino-app.git
+git branch -M main
+git push -u origin main
+```
+
+Replace `YOUR_USERNAME` with your GitHub username.
+
+**4. Verify:** Refresh the GitHub page - you should see your code uploaded.
+
+## Step 8: Deploy to Vercel
+
+Now deploy your casino to the web and get a public URL.
+
+**1. Sign up on Vercel:** Go to [vercel.com](https://vercel.com) → **"Sign Up"** → **"Continue with GitHub"** → Authorize access
+
+**2. Create new project:** Click **"Add New..." → "Project"** → Find `my-casino-app` → **"Import"**
+
+**3. Configure and deploy:** Vercel auto-detects Vite settings. Leave defaults and click **"Deploy"**
+
+**4. Wait for build to complete** (1-2 minutes), then copy your production URL: `https://my-casino-app.vercel.app`
+
+**5. Test your live casino:** Open the URL, connect wallet, place a bet - it works!
+
+**What's next:** Every `git push` automatically deploys. GitHub now shows a "Deployments" tab with deployment history and status checks.
+
+## Step 9: Add Affiliate & Custom RPC
+
+As an affiliate, you earn **30% of house edge revenue** from every bet placed through your casino. Add your wallet address to start earning, and configure custom RPC endpoints for better performance.
+
+**Learn more:** [Affiliate Program](/protocol-hub/partners/affiliates) - track earnings, create freebets, manage leaderboards, and claim revenue.
+
+**1. Add affiliate address to `src/main.tsx`:**
+
+Find the `BetSwirlSDKProvider` component and add `affiliateAddress`:
+
+```tsx
+<BetSwirlSDKProvider
+    initialChainId={base.id}
+    supportedChains={[base.id, polygon.id, arbitrum.id]}
+    affiliateAddress="0xYourWalletAddress" // Add this line
+    bankrollToken={DEGEN_TOKEN}
+    filteredTokens={ALLOWED_TOKENS}
+>
+```
+
+Replace `0xYourWalletAddress` with your actual wallet address.
+
+**2. Add RPC endpoints to Vercel:**
+
+- Go to your project on [vercel.com](https://vercel.com)
+- Click **"Settings"** → **"Environment Variables"**
+- Add these variables:
+
+| Name | Value |
+|------|-------|
+| `VITE_BASE_RPC_URL` | Your Base RPC URL (e.g., from Alchemy, Infura) |
+| `VITE_POLYGON_RPC_URL` | Your Polygon RPC URL |
+| `VITE_ARBITRUM_RPC_URL` | Your Arbitrum RPC URL |
+
+Click **"Save"** after each.
+
+**3. Deploy changes:**
+
+```bash
+git add .
+git commit -m "feat: add affiliate and custom rpc"
+git push
+```
+
+Vercel will automatically redeploy with your affiliate address and RPC endpoints.
+
+**What you get:**
+- 💰 Earn commission on every bet placed through your casino
+- ⚡ Faster, more reliable RPC connections
+- 🚀 Production-ready setup
+
+---
+
+## Optional Enhancements
+
+The base setup above gives you a fully functional casino. Below are optional features you can add to enhance your application.
+
+### 🎮 Multiple Games
+
+Add more games and let users switch between them.
+
+**First, fix button styles in `src/index.css`:**
+
+Find the `button` styles (around line 50) and replace the entire block with:
+
+```css
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+button:focus-visible {
+  outline: 2px solid rgba(225, 159, 31, 0.5);
+  outline-offset: 2px;
+}
+```
+
+This removes Vite's default gray backgrounds and blue borders that would conflict with navigation styling.
+
+**Then replace your `src/App.tsx` with:**
+
+```tsx
+import { useState } from 'react'
+import { CoinTossGame, DiceGame, RouletteGame } from '@betswirl/ui-react'
+
+function App() {
+  const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+
+  return (
+    <div>
+      {/* Note: Inline styles used for tutorial simplicity.
+          For production, use CSS modules or styled-components */}
+      <nav style={{
+        display: 'flex',
+        gap: '8px',
+        justifyContent: 'center',
+        padding: '12px 0',
+        marginBottom: '12px',
+      }}>
+        {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+          <button
+            key={g}
+            onClick={() => setGame(g)}
+            style={{
+              padding: '8px 16px',
+              background: game === g ? 'rgb(225 159 31)' : 'rgba(255, 255, 255, 0.05)',
+              color: game === g ? 'rgb(74 41 24)' : 'rgba(255, 255, 255, 0.6)',
+              border: game === g ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              if (game !== g) {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (game !== g) {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)'
+              }
+            }}
+          >
+            {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+          </button>
+        ))}
+      </nav>
+
+      {game === 'dice' && <DiceGame theme="dark" customTheme={{ "--primary": "rgb(225 159 31)", "--play-btn-font": "rgb(74 41 24)" } as React.CSSProperties} backgroundImage="/game-bg.png" />}
+      {game === 'cointoss' && <CoinTossGame theme="dark" customTheme={{ "--primary": "rgb(225 159 31)", "--play-btn-font": "rgb(74 41 24)" } as React.CSSProperties} backgroundImage="/game-bg.png" />}
+      {game === 'roulette' && <RouletteGame theme="dark" customTheme={{ "--primary": "rgb(225 159 31)", "--play-btn-font": "rgb(74 41 24)" } as React.CSSProperties} backgroundImage="/game-bg.png" />}
+    </div>
+  )
+}
+
+export default App
+```
+
+### 🏆 Leaderboards Integration
+
+**What it does:** Game components already have leaderboards built-in with a "Play now" button. This enhancement makes the "Play now" button automatically switch to the correct game, chain, and token for that tournament (instead of just closing the leaderboard panel).
+
+**Replace your `src/App.tsx` with:**
 
 ```tsx
 import { useState } from 'react'
 import { CASINO_GAME_TYPE, LEADERBOARD_CASINO_RULES_GAME } from '@betswirl/sdk-core'
-import { CoinTossGame, DiceGame, LeaderboardProvider, type PlayNowEvent } from '@betswirl/ui-react'
+import { CoinTossGame, DiceGame, type PlayNowEvent } from '@betswirl/ui-react'
 
 export default function App() {
-  const [currentGame, setCurrentGame] = useState(CASINO_GAME_TYPE.COINTOSS)
+  const [currentGame, setCurrentGame] = useState(CASINO_GAME_TYPE.DICE)
 
-  // Optional: Handle "Play now" button clicks from leaderboards
   const handlePlayNow = (event: PlayNowEvent) => {
     // Switch to the appropriate game
     if (event.games.includes(LEADERBOARD_CASINO_RULES_GAME.COINTOSS)) {
@@ -155,27 +442,75 @@ export default function App() {
   }
 
   return (
-    <LeaderboardProvider onPlayNow={handlePlayNow}>
-      <div>
-        {currentGame === CASINO_GAME_TYPE.COINTOSS && (
-          <CoinTossGame />
-        )}
-        {currentGame === CASINO_GAME_TYPE.DICE && (
-          <DiceGame />
-        )}
-      </div>
-    </LeaderboardProvider>
+    <div>
+      {currentGame === CASINO_GAME_TYPE.COINTOSS && (
+        <CoinTossGame theme="dark" onPlayNow={handlePlayNow} />
+      )}
+      {currentGame === CASINO_GAME_TYPE.DICE && (
+        <DiceGame theme="dark" onPlayNow={handlePlayNow} />
+      )}
+    </div>
   )
 }
 ```
 
-### Run
+**Note:** The `LeaderboardProvider` is already configured in main.tsx (Step 3), so you only need to replace App.tsx with this code to enable leaderboards.
 
-```shell
-npm run dev
+### 💰 Affiliate Program
+
+Earn 30% commission on house edge by adding your affiliate wallet address:
+
+```tsx
+<BetSwirlSDKProvider
+  initialChainId={base.id}
+  supportedChains={[base.id, polygon.id, arbitrum.id]}
+  affiliate="0xYourWalletAddress"  // Add this line
+>
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+**How to join:**
+1. Visit [betswirl.com/affiliate](https://www.betswirl.com/affiliate)
+2. Connect your wallet
+3. Copy your wallet address
+4. Add it to the `affiliate` prop
+5. Track earnings on the affiliate dashboard
+
+### ⚡ Production RPC Setup
+
+For production, use your own RPC endpoints for better reliability:
+
+1. Create `.env` file in project root:
+
+```bash
+VITE_BASE_RPC_URL=https://your-base-rpc.com
+VITE_POLYGON_RPC_URL=https://your-polygon-rpc.com
+VITE_ARBITRUM_RPC_URL=https://your-arbitrum-rpc.com
+```
+
+2. The code in main.tsx already handles custom RPCs via environment variables
+
+**Recommended RPC providers:**
+- [Alchemy](https://www.alchemy.com/)
+- [Infura](https://www.infura.io/)
+- [QuickNode](https://www.quicknode.com/)
+
+### 🎨 Custom Branding
+
+Customize colors to match your brand:
+
+```tsx
+<DiceGame
+  theme="dark"
+  customTheme={{
+    "--primary": "rgb(59 130 246)",           // Your brand color
+    "--play-btn-font": "rgb(255 255 255)",    // Button text color
+    "--background": "rgb(17 24 39)",          // Background color
+  } as React.CSSProperties}
+  backgroundImage="/your-background.png"
+/>
+```
+
+---
 
 ## Deploy
 
@@ -189,29 +524,17 @@ git commit -m "Add BetSwirl casino game"
 
 ### Deploy to Vercel
 
-* Sign in to [vercel.com](https://vercel.com) with GitHub
-* Click "Add New..." → "Project"
-* Select your repository
-* Click "Import" → "Deploy"
-* Get public URL after ~2 minutes
+1. Sign in to [vercel.com](https://vercel.com) with GitHub
+2. Click "Add New..." → "Project"
+3. Select your repository
+4. Add environment variables (if using custom RPCs):
+   - `VITE_BASE_RPC_URL`
+   - `VITE_POLYGON_RPC_URL`
+   - `VITE_ARBITRUM_RPC_URL`
+5. Click "Deploy"
+6. Get public URL after ~2 minutes
 
-## Leaderboard Integration
-
-### onPlayNow Callback
-
-The `onPlayNow` callback allows your app to respond when users click "Play now" in leaderboard components. It receives a `PlayNowEvent` with leaderboard details:
-
-```tsx
-type PlayNowEvent = {
-  chainId: CasinoChainId           // Required network for the leaderboard
-  games: LEADERBOARD_CASINO_RULES_GAME[]  // Allowed games
-  tokens: Token[]                  // Accepted tokens
-}
-```
-
-**Usage:** Pass the callback to any game component to enable automatic game switching from leaderboards.
-
-**Note:** The callback is optional. Without it, "Play now" only closes the leaderboard panel.
+---
 
 ## Configuration
 
