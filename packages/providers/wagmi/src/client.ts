@@ -38,6 +38,10 @@ import type {
   RouletteFreebetParams,
   RoulettePlacedBet,
   RouletteRolledBet,
+  SlotBetParams,
+  SlotFreebetParams,
+  SlotPlacedBet,
+  SlotRolledBet,
   Token,
   WeightedCasinoPlacedBet,
   WeightedGameBetParams,
@@ -71,6 +75,8 @@ import {
   placePlinkoFreebet,
   placeRouletteBet,
   placeRouletteFreebet,
+  placeSlotBet,
+  placeSlotFreebet,
   placeWeightedGameBet,
   placeWeightedGameFreebet,
   placeWheelBet,
@@ -82,6 +88,7 @@ import {
   waitPlinkoRolledBet,
   waitRolledBet,
   waitRouletteRolledBet,
+  waitSlotRolledBet,
   waitWheelRolledBet,
 } from "@betswirl/sdk-core";
 import { switchChain, type Config as WagmiConfig } from "@wagmi/core";
@@ -426,6 +433,54 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
         ...options,
       },
     );
+  }
+
+  async playSlot(
+    params: SlotBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+    chainId?: CasinoChainId,
+  ): Promise<{ placedBet: SlotPlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(chainId);
+    return placeSlotBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetSlot(
+    params: SlotFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: SlotPlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(params.freebet.chainId);
+    return placeSlotFreebet(
+      this.betSwirlWallet,
+      params,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitSlot(
+    placedBet: SlotPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: BP,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: SlotRolledBet; receipt: TransactionReceipt }> {
+    await this._switchChain(placedBet.chainId);
+    return waitSlotRolledBet(this.betSwirlWallet, placedBet, weightedGameConfiguration, houseEdge, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
   }
 
   async playWeightedGame(

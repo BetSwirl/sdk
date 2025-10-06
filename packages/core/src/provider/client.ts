@@ -28,6 +28,7 @@ import type {
   RouletteFreebetParams,
   RoulettePlacedBet,
 } from "../actions/casino/roulette";
+import type { SlotBetParams, SlotFreebetParams, SlotPlacedBet } from "../actions/casino/slot";
 import type { WheelBetParams, WheelFreebetParams, WheelPlacedBet } from "../actions/casino/wheel";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
 import type { LeaderboardClaimRewardsResult } from "../actions/leaderboard/leaderboard";
@@ -87,6 +88,7 @@ import type {
   PlinkoRolledBet,
   RouletteRolledBet,
 } from "../read";
+import type { SlotRolledBet } from "../read/casino/slot";
 import type { WeightedGameConfiguration } from "../read/casino/weightedGame";
 import type { WheelRolledBet } from "../read/casino/wheel";
 import { FORMAT_TYPE, getCasinoChainId } from "../utils";
@@ -237,6 +239,25 @@ export abstract class BetSwirlClient {
     houseEdge: BP,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }>;
+
+  abstract playSlot(
+    params: SlotBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: SlotPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetSlot(
+    params: SlotFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: SlotPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract waitSlot(
+    placedBet: SlotPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: BP,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: SlotRolledBet; receipt: TransactionReceipt }>;
 
   abstract playWeightedGame(
     params: WeightedGameBetParams,

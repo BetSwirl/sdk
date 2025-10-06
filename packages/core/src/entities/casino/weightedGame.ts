@@ -86,7 +86,7 @@ export class WeightedGame extends AbstractCasinoGame<
   }
 
   /**
-   * Determines if a single decoded roll is a winning roll for Weighted Games (Wheel, Plinko).
+   * Determines if a single decoded roll is a winning roll for Weighted Games (Wheel, Plinko, Slot).
    *
    * This method is particularly useful for multibetting scenarios where you need to:
    * - Identify which individual rolls are winners

@@ -75,7 +75,7 @@ const kenoConfig = await client.getKenoConfiguration(token);`
             {
         name: "getWeightedGameConfiguration",
         description: "Retrieves weighted game configuration by ID.",
-        tips: "Use this function to get configuration for wheel, plinko, or custom weighted games.",
+        tips: "Use this function to get configuration for wheel, plinko, slot or custom weighted games.",
         code: `// Get weighted game configuration
 const config = await client.getWeighedGameConfiguration(configId);`
       }
@@ -155,6 +155,18 @@ const result = await client.playPlinko({
 });`
       },
       {
+        name: "playSlot",
+        description: "Places a bet on the slot game with specified parameters.",
+        tips: "Make sure to validate parameters before calling this function. If an approval is needed, it will be automatically handled by the SDK. You can get the weighted game configuration with the \"getWeightedGameConfiguration\" function.",
+        code: `// Place slot bet
+const result = await client.playSlot({
+  weightedGameConfig: slotConfig,
+  betAmount: parseEther("0.1"),
+  betToken: "0x...",
+  receiver: userAddress
+});`
+      },
+      {
         name: "playWeightedGame",
         description: "Places a bet on a custom weighted game with specified parameters.",
         tips: "Use this for custom games not in the list of weighted games. You can also use it for Wheel & Plinko.",
@@ -225,6 +237,18 @@ const { rolledBet, receipt } = await client.waitWheel(
         tips: "Use this function to wait for the bet result after placing a bet. It generally takes 3 to 15 seconds for a bet to be rolled.",
         code: `// Wait for plinko result
 const { rolledBet, receipt } = await client.waitPlinko(
+  placedBet,
+  weightedGameConfig,
+  houseEdge,
+  { pollingInterval: 1000 }
+);`
+      },
+      {
+        name: "waitSlot",
+        description: "Waits for a slot bet to be rolled and returns the result.",
+        tips: "Use this function to wait for the bet result after placing a bet. It generally takes 3 to 15 seconds for a bet to be rolled.",
+        code: `// Wait for slot result
+const { rolledBet, receipt } = await client.waitSlot(
   placedBet,
   weightedGameConfig,
   houseEdge,
@@ -362,6 +386,16 @@ const result = await client.playFreebetWheel({
 const result = await client.playFreebetPlinko({
   freebet: signedFreebet,
   weightedGameConfig: plinkoConfig,
+});`
+      },
+            {
+        name: "playFreebetSlot",
+        description: "Places a freebet on the slot game.",
+        tips: "Use this function to place a bet using a freebet instead of user tokens. Only a single bet (betCount = 1) can be placed with a freebet.",
+        code: `// Place freebet slot
+const result = await client.playFreebetSlot({
+  freebet: signedFreebet,
+  weightedGameConfig: slotConfig,
 });`
       },
       {

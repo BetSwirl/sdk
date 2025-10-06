@@ -57,7 +57,7 @@ const kenoConfig = await yourBetSwirlClient.getKenoConfiguration(
 const kenoInputs = Keno.getChoiceInputs(kenoConfig, gameToken.affiliateHouseEdge)
 const selectedKenoInput = kenoInputs[0]
 
-// 2.5 Wheel/Plinko - Get the game configuration
+// 2.5 Wheel/Plinko/Slot - Get the game configuration
 // You could bring your own configurations here by passing customConfigurations in getChoiceInputs
 const weightedGameInputs = WeightedGame.getChoiceInputs(
     gameToken.chainId,

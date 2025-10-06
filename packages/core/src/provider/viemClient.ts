@@ -71,6 +71,13 @@ import {
   placeKenoFreebet,
 } from "../actions/casino/keno";
 import {
+  placeSlotBet,
+  placeSlotFreebet,
+  type SlotBetParams,
+  type SlotFreebetParams,
+  type SlotPlacedBet,
+} from "../actions/casino/slot";
+import {
   placeWheelBet,
   placeWheelFreebet,
   type WheelBetParams,
@@ -82,6 +89,7 @@ import {
   type LeaderboardClaimRewardsResult,
 } from "../actions/leaderboard/leaderboard";
 import type { CASINO_GAME_TYPE, ChainId, Leaderboard } from "../data";
+import { type SlotRolledBet, waitSlotRolledBet } from "../read/casino/slot";
 import {
   getWeightedGameConfiguration,
   type WeightedGameConfiguration,
@@ -404,6 +412,50 @@ export class ViemBetSwirlClient extends BetSwirlClient {
         ...options,
       },
     );
+  }
+
+  async playSlot(
+    params: SlotBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: SlotPlacedBet; receipt: TransactionReceipt }> {
+    return placeSlotBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetSlot(
+    params: SlotFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: SlotPlacedBet; receipt: TransactionReceipt }> {
+    return placeSlotFreebet(
+      this.betSwirlWallet,
+      params,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitSlot(
+    placedBet: SlotPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: BP,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: SlotRolledBet; receipt: TransactionReceipt }> {
+    return waitSlotRolledBet(this.betSwirlWallet, placedBet, weightedGameConfiguration, houseEdge, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
   }
 
   async playWeightedGame(
