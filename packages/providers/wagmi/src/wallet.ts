@@ -10,13 +10,22 @@ import {
   getTransactionReceipt,
   readContract,
   readContracts,
+  signTypedData,
   simulateContract,
   type Config as WagmiConfig,
   waitForTransactionReceipt,
   watchContractEvent,
   writeContract,
 } from "@wagmi/core";
-import type { Abi, CallReturnType, Hash, PublicClient, TransactionReceipt } from "viem";
+import type {
+  Abi,
+  CallReturnType,
+  Hash,
+  PublicClient,
+  TransactionReceipt,
+  TypedDataDomain,
+  TypedDataParameter,
+} from "viem";
 
 export class WagmiBetSwirlWallet extends BetSwirlWallet {
   private wagmiConfig: WagmiConfig;
@@ -131,5 +140,17 @@ export class WagmiBetSwirlWallet extends BetSwirlWallet {
 
   async waitTransaction(txHash: Hash, pollingInterval?: number): Promise<TransactionReceipt> {
     return await waitForTransactionReceipt(this.wagmiConfig, { hash: txHash, pollingInterval });
+  }
+
+  // TODO to improve to avoid unknown/string
+  async signTypedData<
+    TTypedData extends {
+      domain: TypedDataDomain;
+      types: Record<string, readonly TypedDataParameter[]>;
+      primaryType: string;
+      message: Record<string, unknown>;
+    },
+  >(typedData: TTypedData): Promise<Hash> {
+    return signTypedData(this.wagmiConfig, typedData);
   }
 }

@@ -4,6 +4,8 @@ import type {
   Hash,
   PublicClient,
   TransactionReceipt,
+  TypedDataDomain,
+  TypedDataParameter,
   WalletClient,
 } from "viem";
 import type { BetSwirlExtendedEventData, BetSwirlFunctionData } from "../interfaces";
@@ -112,6 +114,32 @@ export class ViemBetSwirlWallet extends BetSwirlWallet {
     return this.publicClient.waitForTransactionReceipt({
       hash: txHash,
       pollingInterval,
+    });
+  }
+  // TODO to improve to avoid unknown/any
+  async signTypedData<
+    TTypedData extends {
+      domain: TypedDataDomain;
+      types: Record<string, readonly TypedDataParameter[]>;
+      primaryType: string;
+      message: Record<string, unknown>;
+    },
+  >(typedData: TTypedData): Promise<Hash> {
+    if (!this.walletClient) {
+      throw new Error("[ViemBetSwirlWallet] Wallet client is not initialized");
+    }
+
+    const account = this.getAccount();
+    if (!account) {
+      throw new Error("[ViemBetSwirlWallet] Account is not initialized");
+    }
+
+    return this.walletClient.signTypedData({
+      account: account,
+      domain: typedData.domain,
+      types: typedData.types,
+      primaryType: typedData.primaryType,
+      message: typedData.message,
     });
   }
 }

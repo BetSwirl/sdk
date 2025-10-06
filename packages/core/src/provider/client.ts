@@ -423,6 +423,11 @@ export abstract class BetSwirlClient {
     return fetchFreebetCampaign(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
   }
 
+  abstract signAndClaimFreebetCode(
+    code: string,
+    chainId?: CasinoChainId,
+  ): Promise<{ success: boolean; error?: string }>;
+
   async fetchFreebetCodeCampaigns(
     limit = 10,
     offset = 0,

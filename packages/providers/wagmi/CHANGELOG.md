@@ -1,5 +1,23 @@
 # @betswirl/wagmi-provider
 
+## 0.1.24
+
+### Patch Changes
+
+- Fix claim freebet code APi call body
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.24
+
+## 0.1.23
+
+### Patch Changes
+
+- Add sign/claim freebet code
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.23
+
 ## 0.1.22
 
 ### Patch Changes
