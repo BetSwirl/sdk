@@ -1,6 +1,6 @@
 # React Integration Guide
 
-Build a Web3 casino with just a few steps! This guide will walk you through creating a casino application using BetSwirl's React UI library.
+This guide walks you through creating a casino application using BetSwirl's React UI library.
 
 **What you'll build:** A fully functional dice game with multi-chain support, custom theming, and background image - exactly like our [live demo](https://ui-react-demo.betswirl.com).
 
@@ -81,7 +81,7 @@ const onChainKitConfig: AppConfig = {
   }
 }
 
-// Optional: Define tokens for your application
+// Token definitions (you can add more or use different tokens)
 const DEGEN_TOKEN: TokenWithImage = {
   address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
   symbol: "DEGEN",
@@ -96,7 +96,7 @@ const ETH_TOKEN: TokenWithImage = {
   image: "https://www.betswirl.com/img/tokens/ETH.svg"
 }
 
-// Optional: Limit available tokens to specific ones
+// Limit available tokens (remove this to show all supported tokens)
 const ALLOWED_TOKENS = [
   DEGEN_TOKEN.address,
   ETH_TOKEN.address,
@@ -138,7 +138,7 @@ createRoot(document.getElementById('root')!).render(
 - **BetSwirl Providers**: Handle betting logic, token management, freebets, and leaderboards
 - **Multi-chain support**: Base, Polygon, and Arbitrum configured
 - **Custom RPCs**: Fallback to default public RPCs if env variables not set
-- **Token filtering**: Limit available tokens to DEGEN, ETH, USDC, and BETS
+- **Token filtering**: Limits available tokens to DEGEN, ETH, USDC, and BETS (you can change this list or remove to show all tokens - see [Configuration](#configuration) section below)
 
 ## Step 4: Add Game Component
 
@@ -187,7 +187,7 @@ Download two background images - one for the page and one for the game component
 
 4. **Add page background style** to `src/index.css`:
 
-Open `src/index.css` and add these styles to the `body` section (around line 25):
+Open `src/index.css` and add these styles to the `body` section:
 
 ```css
 body {
@@ -272,7 +272,7 @@ Now deploy your casino to the web and get a public URL.
 
 **4. Wait for build to complete** (1-2 minutes), then copy your production URL: `https://my-casino-app.vercel.app`
 
-**5. Test your live casino:** Open the URL, connect wallet, place a bet - it works!
+**5. Test your live casino:** Open the URL, connect wallet, and place a bet.
 
 **What's next:** Every `git push` automatically deploys. GitHub now shows a "Deployments" tab with deployment history and status checks.
 
@@ -282,35 +282,47 @@ As an affiliate, you earn **30% of house edge revenue** from every bet placed th
 
 **Learn more:** [Affiliate Program](/protocol-hub/partners/affiliates) - track earnings, create freebets, manage leaderboards, and claim revenue.
 
-**1. Add affiliate address to `src/main.tsx`:**
+**1. Add environment variables to Vercel:**
 
-Find the `BetSwirlSDKProvider` component and add `affiliateAddress`:
+- Go to your project on [vercel.com](https://vercel.com)
+- Click **"Settings"** → **"Environment Variables"**
+- Add your affiliate address (required):
+
+| Name | Value |
+|------|-------|
+| `VITE_AFFILIATE_ADDRESS` | Your wallet address (to earn 30% commission) |
+
+- **Optional:** Add custom RPC endpoints for better performance and reliability. Without these, the app uses free public RPCs which may be slower or rate-limited:
+
+| Name | Value |
+|------|-------|
+| `VITE_BASE_RPC_URL` | Your Base RPC URL |
+| `VITE_POLYGON_RPC_URL` | Your Polygon RPC URL |
+| `VITE_ARBITRUM_RPC_URL` | Your Arbitrum RPC URL |
+
+**RPC providers:** [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/), [QuickNode](https://www.quicknode.com/) (most offer free tiers)
+
+Click **"Save"** after adding variables.
+
+**2. Update `src/main.tsx` to read affiliate address:**
+
+Add this line at the top with other env variables:
+
+```tsx
+const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS
+```
+
+Then add `affiliate` prop to `BetSwirlSDKProvider`:
 
 ```tsx
 <BetSwirlSDKProvider
     initialChainId={base.id}
     supportedChains={[base.id, polygon.id, arbitrum.id]}
-    affiliateAddress="0xYourWalletAddress" // Add this line
+    affiliate={affiliateAddress}  // Add this line
     bankrollToken={DEGEN_TOKEN}
     filteredTokens={ALLOWED_TOKENS}
 >
 ```
-
-Replace `0xYourWalletAddress` with your actual wallet address.
-
-**2. Add RPC endpoints to Vercel:**
-
-- Go to your project on [vercel.com](https://vercel.com)
-- Click **"Settings"** → **"Environment Variables"**
-- Add these variables:
-
-| Name | Value |
-|------|-------|
-| `VITE_BASE_RPC_URL` | Your Base RPC URL (e.g., from Alchemy, Infura) |
-| `VITE_POLYGON_RPC_URL` | Your Polygon RPC URL |
-| `VITE_ARBITRUM_RPC_URL` | Your Arbitrum RPC URL |
-
-Click **"Save"** after each.
 
 **3. Deploy changes:**
 
@@ -322,10 +334,14 @@ git push
 
 Vercel will automatically redeploy with your affiliate address and RPC endpoints.
 
-**What you get:**
-- 💰 Earn commission on every bet placed through your casino
-- ⚡ Faster, more reliable RPC connections
-- 🚀 Production-ready setup
+**4. Check your earnings:**
+
+Once deployed, track your affiliate revenue:
+
+1. Go to [Revenues Dashboard](https://www.betswirl.com/base/affiliate/revenues)
+2. Connect the same wallet you used for `VITE_AFFILIATE_ADDRESS`
+3. View your earnings in real-time (30% of house edge from each bet)
+4. Click **"Claim"** to withdraw your earnings
 
 ---
 
@@ -339,7 +355,7 @@ Add more games and let users switch between them.
 
 **First, fix button styles in `src/index.css`:**
 
-Find the `button` styles (around line 50) and replace the entire block with:
+Find the `button` styles and replace the entire block with:
 
 ```css
 button {
@@ -354,7 +370,72 @@ button:focus-visible {
 
 This removes Vite's default gray backgrounds and blue borders that would conflict with navigation styling.
 
-**Then replace your `src/App.tsx` with:**
+**Then update your `src/App.tsx`:**
+
+**1. Add imports** at the top:
+
+Add `useState` from React:
+```tsx
+import { useState } from 'react'
+```
+
+Update your BetSwirl import to include more games:
+```tsx
+// Change this:
+import { DiceGame } from '@betswirl/ui-react'
+
+// To this:
+import { CoinTossGame, DiceGame, RouletteGame } from '@betswirl/ui-react'
+```
+
+**2. Add state** inside your App function (before the return):
+
+```tsx
+const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+```
+
+**3. Wrap your existing game** with navigation:
+
+```tsx
+return (
+  <div>
+    {/* Navigation buttons */}
+    <nav style={{
+      display: 'flex',
+      gap: '8px',
+      justifyContent: 'center',
+      padding: '12px 0',
+      marginBottom: '12px',
+    }}>
+      {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+        <button
+          key={g}
+          onClick={() => setGame(g)}
+          style={{
+            padding: '8px 16px',
+            background: game === g ? 'rgb(225 159 31)' : 'rgba(255, 255, 255, 0.05)',
+            color: game === g ? 'rgb(74 41 24)' : 'rgba(255, 255, 255, 0.6)',
+            border: game === g ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '6px',
+            fontSize: '14px',
+            fontWeight: '500',
+            transition: 'all 0.2s',
+          }}
+        >
+          {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+        </button>
+      ))}
+    </nav>
+
+    {/* Games - keep your existing props (theme, customTheme, backgroundImage, etc.) */}
+    {game === 'dice' && <DiceGame /* ...your existing props */ />}
+    {game === 'cointoss' && <CoinTossGame /* ...your existing props */ />}
+    {game === 'roulette' && <RouletteGame /* ...your existing props */ />}
+  </div>
+)
+```
+
+**Full example** if you have the default setup from Step 4:
 
 ```tsx
 import { useState } from 'react'
@@ -365,8 +446,6 @@ function App() {
 
   return (
     <div>
-      {/* Note: Inline styles used for tutorial simplicity.
-          For production, use CSS modules or styled-components */}
       <nav style={{
         display: 'flex',
         gap: '8px',
@@ -384,22 +463,9 @@ function App() {
               color: game === g ? 'rgb(74 41 24)' : 'rgba(255, 255, 255, 0.6)',
               border: game === g ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '6px',
-              cursor: 'pointer',
               fontSize: '14px',
               fontWeight: '500',
               transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              if (game !== g) {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (game !== g) {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)'
-              }
             }}
           >
             {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
@@ -456,44 +522,6 @@ export default function App() {
 
 **Note:** The `LeaderboardProvider` is already configured in main.tsx (Step 3), so you only need to replace App.tsx with this code to enable leaderboards.
 
-### 💰 Affiliate Program
-
-Earn 30% commission on house edge by adding your affiliate wallet address:
-
-```tsx
-<BetSwirlSDKProvider
-  initialChainId={base.id}
-  supportedChains={[base.id, polygon.id, arbitrum.id]}
-  affiliate="0xYourWalletAddress"  // Add this line
->
-```
-
-**How to join:**
-1. Visit [betswirl.com/affiliate](https://www.betswirl.com/affiliate)
-2. Connect your wallet
-3. Copy your wallet address
-4. Add it to the `affiliate` prop
-5. Track earnings on the affiliate dashboard
-
-### ⚡ Production RPC Setup
-
-For production, use your own RPC endpoints for better reliability:
-
-1. Create `.env` file in project root:
-
-```bash
-VITE_BASE_RPC_URL=https://your-base-rpc.com
-VITE_POLYGON_RPC_URL=https://your-polygon-rpc.com
-VITE_ARBITRUM_RPC_URL=https://your-arbitrum-rpc.com
-```
-
-2. The code in main.tsx already handles custom RPCs via environment variables
-
-**Recommended RPC providers:**
-- [Alchemy](https://www.alchemy.com/)
-- [Infura](https://www.infura.io/)
-- [QuickNode](https://www.quicknode.com/)
-
 ### 🎨 Custom Branding
 
 Customize colors to match your brand:
@@ -512,216 +540,118 @@ Customize colors to match your brand:
 
 ---
 
-## Deploy
+## Configuration Reference
 
-### Push to GitHub
+This section explains all parameters you can configure in `BetSwirlSDKProvider`.
 
-```shell
-git init
-git add .
-git commit -m "Add BetSwirl casino game"
+### Required Parameters
+
+#### `initialChainId`
+
+**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
+
+**What it does:** Sets which blockchain network your app starts on when the page loads.
+
+**Accepted values:**
+- `base.id` (8453) - Base mainnet
+- `polygon.id` (137) - Polygon mainnet
+- `arbitrum.id` (42161) - Arbitrum mainnet
+- `avalanche.id` (43114) - Avalanche mainnet
+- `bsc.id` (56) - BSC mainnet
+
+**Example:**
+```tsx
+<BetSwirlSDKProvider initialChainId={base.id}>
 ```
 
-### Deploy to Vercel
+#### `supportedChains`
 
-1. Sign in to [vercel.com](https://vercel.com) with GitHub
-2. Click "Add New..." → "Project"
-3. Select your repository
-4. Add environment variables (if using custom RPCs):
-   - `VITE_BASE_RPC_URL`
-   - `VITE_POLYGON_RPC_URL`
-   - `VITE_ARBITRUM_RPC_URL`
-5. Click "Deploy"
-6. Get public URL after ~2 minutes
+**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
 
----
+**What it does:** Defines which blockchain networks users can switch between in your app. Must match the chains you configured in wagmi.
 
-## Configuration
+**Accepted values:** Array of chain IDs - must be the same chains you set up in `createConfig`
 
-### BetSwirlSDKProvider Props
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `initialChainId` | `number` | **Required.** Chain ID to initialize the SDK with |
-| `supportedChains` | `number[]` | **Required.** Array of chain IDs to enable multi-chain support. Must include at least one supported chain ID |
-| `affiliate` | `string` | Optional. Your wallet address to receive affiliate commissions. If not provided, default affiliate will be used |
-| `bankrollToken` | `TokenWithImage` | Optional. Default token for betting. Must include `address`, `symbol`, `decimals`, and `image` properties. [See available tokens →](https://documentation-betswirl.vercel.app/developer-hub/demos/miniapp/checking-available-tokens) |
-| `filteredTokens` | `string[]` | Optional. Array of token addresses to limit which tokens are available for selection. If not provided, all supported tokens will be available. [Learn more about token filtering →](https://documentation-betswirl.vercel.app/developer-hub/demos/miniapp/checking-available-tokens#token-filtering) |
-
-### Multi-Chain Support
-
-To enable multiple chains, you need to:
-1. Configure the chains in wagmi config
-2. Pass the same chain IDs to `supportedChains` prop
-
-#### Supported Chains
-
-BetSwirl protocol is deployed on the following chains:
-
-**Mainnet:**
-- Base (8453)
-- Polygon (137)
-- Avalanche (43114)
-- Arbitrum (42161)
-- BSC/BNB Chain (56)
-
-**Testnet:**
-- Base Sepolia (84532)
-- Polygon Amoy (80002)
-- Avalanche Fuji (43113)
-- Arbitrum Sepolia (421614)
-
-When multiple chains are configured:
-- Players can switch between chains using the chain selector in the betting panel
-- Chain preferences are persisted per wallet address
-- Token balances update automatically when switching chains
-
-**⚠️ IMPORTANT:** You must configure the same chains in both wagmi and BetSwirlSDKProvider!
-
-#### Simple Setup (Using Default RPCs)
-
+**Example:**
 ```tsx
-import { createConfig, WagmiProvider, http } from 'wagmi'
-import { base, polygon, arbitrum } from 'wagmi/chains'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { OnchainKitProvider } from '@coinbase/onchainkit'
-import { BetSwirlSDKProvider, TokenProvider, BalanceProvider } from '@betswirl/ui-react'
-
-// 1. Choose your chains
-const chains = [base, polygon, arbitrum]
-
-// 2. Create wagmi config (uses default public RPCs)
+// In wagmi config
 const config = createConfig({
-  chains,
-  transports: {
-    [base.id]: http(),
-    [polygon.id]: http(),
-    [arbitrum.id]: http(),
-  },
+  chains: [base, polygon, arbitrum],
+  // ...
 })
 
-// 3. Create query client
-const queryClient = new QueryClient()
-
-// 4. Setup providers
-<WagmiProvider config={config}>
-  <QueryClientProvider client={queryClient}>
-    <OnchainKitProvider chain={base}>
-      <BetSwirlSDKProvider
-        initialChainId={base.id}
-        supportedChains={chains.map(chain => chain.id)} // Same chains!
-      >
-        <TokenProvider>
-          <BalanceProvider>
-            <App />
-          </BalanceProvider>
-        </TokenProvider>
-      </BetSwirlSDKProvider>
-    </OnchainKitProvider>
-  </QueryClientProvider>
-</WagmiProvider>
+// In BetSwirlSDKProvider - use the SAME chains
+<BetSwirlSDKProvider
+  supportedChains={[base.id, polygon.id, arbitrum.id]}
+>
 ```
 
-#### Production Setup (Custom RPCs)
+### Optional Parameters
 
-If you need your own RPC endpoints (recommended for production), use environment variables:
+#### `affiliate`
 
+**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
+
+**What it does:** Your wallet address to earn 30% commission from all bets placed through your casino.
+
+**Accepted values:** Any valid Ethereum wallet address (starts with `0x`)
+
+**Best practice:** Use environment variable instead of hardcoding
+
+**Example:**
 ```tsx
-const config = createConfig({
-  chains,
-  transports: {
-    [base.id]: http(import.meta.env.VITE_BASE_RPC_URL),
-    [polygon.id]: http(import.meta.env.VITE_POLYGON_RPC_URL),
-    [arbitrum.id]: http(import.meta.env.VITE_ARBITRUM_RPC_URL),
-  },
-})
+// Read from environment variable (recommended)
+const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS
+
+<BetSwirlSDKProvider affiliate={affiliateAddress}>
 ```
 
-Create `.env` file in your project root:
+#### `bankrollToken`
 
-```bash
-VITE_BASE_RPC_URL=https://your-base-rpc.com
-VITE_POLYGON_RPC_URL=https://your-polygon-rpc.com
-VITE_ARBITRUM_RPC_URL=https://your-arbitrum-rpc.com
-```
+**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
 
-**Why custom RPCs?** Default public RPCs have rate limits and can be slow or unreliable.
+**What it does:** Sets which token is selected by default when the game loads.
 
-⚠️ **Warning:** If you include a chain in `supportedChains` that is not configured in wagmi, users will see the chain option but it won't work when selected.
+**Accepted values:** A `TokenWithImage` object with these properties:
+- `address` - Token contract address (use `0x0000...0000` for native token like ETH)
+- `symbol` - Token name (e.g., "ETH", "DEGEN", "USDC")
+- `decimals` - Usually 18 (or 6 for USDC)
+- `image` - URL to token icon
 
-
-#### TokenWithImage Interface
-
+**Example:**
 ```tsx
-interface TokenWithImage {
-  address: string      // Token contract address (use "0x0000000000000000000000000000000000000000" for native token)
-  symbol: string       // Token symbol (e.g., "ETH", "DEGEN", "USDC")
-  decimals: number     // Token decimals (18 for most tokens, 6 for USDC)
-  image: string        // URL to token icon image
-}
-```
-
-## Common Issues and Solutions
-
-### TypeScript Errors
-
-**Problem:** `Type 'string' is not assignable to type 'TokenWithImage'`
-
-```tsx
-// ❌ Wrong - missing required properties
-<BetSwirlSDKProvider bankrollToken="DEGEN" />
-
-// ✅ Correct - complete TokenWithImage object
-const DEGEN_TOKEN: TokenWithImage = {
+const DEGEN_TOKEN = {
   address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
   symbol: "DEGEN",
   decimals: 18,
   image: "https://www.betswirl.com/img/tokens/DEGEN.svg"
 }
-<BetSwirlSDKProvider bankrollToken={DEGEN_TOKEN} />
+
+<BetSwirlSDKProvider bankrollToken={DEGEN_TOKEN}>
 ```
 
-**Problem:** `Property 'initialChainId' is missing`
+#### `filteredTokens`
 
+**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
+
+**What it does:** Limits which tokens users can select for betting. Without this, all supported tokens will be available.
+
+**Accepted values:** Array of token contract addresses
+
+**Why use it:** Simplify UI by showing only popular tokens
+
+**Example:**
 ```tsx
-// ❌ Wrong - missing required prop
-<BetSwirlSDKProvider>
-  <App />
-</BetSwirlSDKProvider>
+const ALLOWED_TOKENS = [
+  "0x0000000000000000000000000000000000000000", // ETH
+  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC
+  "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed", // DEGEN
+]
 
-// ✅ Correct - include required initialChainId
-<BetSwirlSDKProvider initialChainId={base.id}>
-  <App />
-</BetSwirlSDKProvider>
+<BetSwirlSDKProvider filteredTokens={ALLOWED_TOKENS}>
 ```
 
-### Token Configuration Issues
-
-**Problem:** Token not appearing in the selection list
-
-- Verify the token address is correct and matches the Bank contract
-- Check that `allowed = true` and `paused = false` in the Bank contract
-- Ensure the token is not filtered out by `filteredTokens` prop
-- If using `filteredTokens`, make sure the token address is included in the array
-
-**Problem:** Too many tokens in the selection list
-
-Use `filteredTokens` to limit available options:
-```tsx
-// ✅ Limit to specific tokens for better UX
-<BetSwirlSDKProvider
-  initialChainId={base.id}
-  filteredTokens={["0x0000000000000000000000000000000000000000", "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"]}
->
-  <App />
-</BetSwirlSDKProvider>
-```
-
-**Problem:** Token icon not displaying
-
-- Verify the `image` URL is accessible and returns a valid image
-- Use the standard BetSwirl token image pattern: `https://www.betswirl.com/img/tokens/{SYMBOL}.svg`
-- Ensure the image URL supports CORS for web applications
+---
 
 ## Example Result
 
