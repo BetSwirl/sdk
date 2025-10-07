@@ -32,9 +32,6 @@ export async function claimFreebetCode(
       `${getBetSwirlApiUrl(testMode)}/public/v1/freebet/code-campaigns/claim`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(
           {
             user_signature: signature,

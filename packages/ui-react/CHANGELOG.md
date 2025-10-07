@@ -1,5 +1,23 @@
 # @betswirl/ui-react
 
+## 0.2.7
+
+### Patch Changes
+
+- Fix claim freebet code parsing
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.26
+  - @betswirl/sdk-core@0.1.26
+
+## 0.2.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.25
+  - @betswirl/wagmi-provider@0.1.25
+
 ## 0.2.5
 
 ### Patch Changes
