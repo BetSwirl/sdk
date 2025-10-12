@@ -99,7 +99,7 @@ const meta = {
         title: "⏱️ Quick Starts",
         items: {
           miniapp: {
-            title: "Your MiniApp in 1h",
+            title: "Your Farcaster Mini App in 1h",
           },
           react: {
             title: "Your React App in 1h",
@@ -184,7 +184,7 @@ const meta = {
         title: "▶️ Demos",
         items: {
           miniapp: {
-            title: "MiniApp",
+            title: "Farcaster Mini App",
           },
           "node-cli": {
             title: "Node CLI",

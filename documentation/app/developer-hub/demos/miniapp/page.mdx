@@ -336,7 +336,7 @@ If you added environment variables for the manifest in Vercel project settings a
 4. Click the **"Redeploy"**       
 ![Redeploy](./screenshots/redeploy.png)
 
-## Test mini-app in Farcaster
+## Test Farcaster Mini App
 
 After deployment, the manifest can be viewed at this URL - `https://[your-app].vercel.app/.well-known/farcaster.json`
 
@@ -350,22 +350,22 @@ If the manifest is valid, you'll see - `"Mini App configuration is valid."` in t
 
 You can launch the application by clicking the **Launch** button.
 
-![Testing mini-app](./screenshots/launchMiniApp.png)
+![Testing Farcaster Mini App](./screenshots/launchMiniApp.png)
 
 If the manifest is not valid, check if you have correctly filled all required environment variables and redeployed after making changes.
 
-This message  - `"[your-app].vercel.app does not have a valid manifest setup."` appears if the domain is not associated with your account. It's not required for mini app rendering or testing.   
-![Testing mini-app](./screenshots/notValidManifest.png)   
+This message  - `"[your-app].vercel.app does not have a valid manifest setup."` appears if the domain is not associated with your account. It's not required for Farcaster Mini App rendering or testing.   
+![Testing Farcaster Mini App](./screenshots/notValidManifest.png)   
 
 **Additional Information:**
 - [Hosted Manifest Guide](./hosted-manifest-guide)
 
-## Post your mini-app
+## Post Your Farcaster Mini App
 
-Once you have a valid manifest, you can share your mini-app by posting its URL (`https://[your-app].vercel.app`) in a Farcaster cast. Users will be able to launch it directly from the cast. This will work even without generating Account association.
+Once you have a valid manifest, you can share your Farcaster Mini App by posting its URL (`https://[your-app].vercel.app`) in a Farcaster cast. Users will be able to launch it directly from the cast. This will work even without generating Account association.
 
 ## Account Association
-Account association links the domain to your account. After this, users will be able to add your application to their mini-app list. You can generate a signed account association object using the [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) in Warpcast. You need to have the Warpcast app installed on your phone.
+Account association links the domain to your account. After this, users will be able to add your application to their Farcaster Mini App list. You can generate a signed account association object using the [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) in Warpcast. You need to have the Warpcast app installed on your phone.
 
 On the manifest page:
 1. Click the **"Generate account association"** button   
@@ -393,9 +393,9 @@ In the domain verification details table, the **Signature** field should show `"
 **Additional Information:**
 - [Verifying ownership](https://miniapps.farcaster.xyz/docs/guides/publishing#verifying-ownership)
 
-## Mini App search visibility
+## Farcaster Mini App Search Visibility
 
-For your app to appear in Farcaster's mini-app search, **Account Association** must be configured. Without it, your app will not be included in search results.
+For your app to appear in Farcaster's Mini App search, **Account Association** must be configured. Without it, your app will not be included in search results.
 
 Set these variables if they are not already set:   
 
