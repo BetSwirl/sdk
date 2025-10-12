@@ -1,17 +1,28 @@
 # Farcaster Mini App Integration Guide
 
+import { Tabs } from 'nextra/components'
+
 ## Create MiniKit Project with BetSwirl
 
-### Using Existing Template
-
+<Tabs items={['Fork Repository', 'From Scratch']}>
+  <Tabs.Tab>
 **Fork this repository:** https://github.com/BetSwirl/miniapp-ui-react-demo
 
 ```shell
 # Install dependencies
 npm install
+
+# Start dev server
+npm run dev
 ```
 
-### Create from Scratch
+Open in browser `http://localhost:3000/`
+
+**That's it!** The template includes all necessary setup: providers, game component, and styling.
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+### Step 1: Create MiniKit project
 
 ```shell
 # Create new MiniKit project
@@ -29,7 +40,7 @@ cd your-mini-project
 npm i @betswirl/ui-react
 ```
 
-### Set up Providers
+### Step 2: Set up Providers
 
 Replace the code in `app/providers.tsx` with:
 
@@ -109,10 +120,9 @@ export function Providers(props: { children: ReactNode }) {
 }
 ```
 
-### Add Game Component
+### Step 3: Add Game Component
 
-Add the game component in `app/page.tsx`.
-This code is enough:
+Add the game component in `app/page.tsx`:
 
 ```tsx
 "use client";
@@ -183,13 +193,15 @@ export default function App() {
 }
 ```
 
-### Start dev server
+### Step 4: Start dev server
 
 ```shell
 npm run dev
 ```
 
 Open in browser `http://localhost:3000/`
+  </Tabs.Tab>
+</Tabs>
 
 ## Environment Variables
 

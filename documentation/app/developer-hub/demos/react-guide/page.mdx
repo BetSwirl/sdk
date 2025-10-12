@@ -1,11 +1,21 @@
 # React Integration Guide
 
+import { Tabs } from 'nextra/components'
+
 This guide walks you through creating a casino application using BetSwirl's React UI library.
 
 **What you'll build:** A fully functional dice game with multi-chain support, custom theming, and background image - exactly like our [live demo](https://ui-react-demo.betswirl.com).
 
 **Time:** ~10 minutes
 
+<Tabs items={['Fork Repository', 'From Scratch']}>
+  <Tabs.Tab>
+**Coming soon**: Fork our ready-to-use React dApp template.
+
+For now, follow the "From Scratch" tab to build your own.
+  </Tabs.Tab>
+
+  <Tabs.Tab>
 ## Step 1: Create Project
 
 ```shell
@@ -287,8 +297,10 @@ git push -u origin main
 Replace `YOUR_USERNAME` with your GitHub username.
 
 **4. Verify:** Refresh the GitHub page - you should see your code uploaded.
+  </Tabs.Tab>
+</Tabs>
 
-## Step 8: Deploy to Vercel
+## Deploy to Vercel
 
 Now deploy your casino to the web and get a public URL.
 
@@ -304,7 +316,7 @@ Now deploy your casino to the web and get a public URL.
 
 **What's next:** Every `git push` automatically deploys. GitHub now shows a "Deployments" tab with deployment history and status checks.
 
-## Step 9: Add Affiliate & Custom RPC
+## Add Affiliate & Custom RPC
 
 As an affiliate, you earn **30% of house edge revenue** from every bet placed through your casino. Add your wallet address to start earning, and configure custom RPC endpoints for better performance.
 
