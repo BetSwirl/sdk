@@ -118,7 +118,7 @@ createRoot(document.getElementById('root')!).render(
             <TokenProvider>
               <BalanceProvider>
                 <FreebetsProvider>
-                  <LeaderboardProvider>
+                  <LeaderboardProvider onPlayNow={() => {}}>
                     <App />
                   </LeaderboardProvider>
                 </FreebetsProvider>
@@ -169,23 +169,55 @@ export default App
 - **Custom colors**: Gold primary color (`rgb(225 159 31)`) and dark brown button text
 - **Background image**: Will add in next step
 
-## Step 5: Add Background Images
+## Step 5: Custom Branding
+
+Customize theme, colors and backgrounds to match your brand.
+
+**Available customization options:**
+
+**Theme:** Choose between `"light"`, `"dark"`, or `"system"` (auto-detects user preference)
+
+**Colors you can customize:**
+- `--primary` - Main brand color (buttons, highlights)
+- `--play-btn-font` - Text color on Play button
+- `--connect-btn-font` - Text color on Connect Wallet button
+- `--game-window-overlay` - Overlay color for game window
+- `--background` - Background color
+
+**Background image:** Any image URL or local file from `public/` folder
+
+**1. Customize theme and colors - update your `src/App.tsx`:**
+
+```tsx
+<DiceGame
+  theme="dark"                              // or "light" or "system"
+  customTheme={{
+    "--primary": "rgb(59 130 246)",         // Brand color
+    "--play-btn-font": "rgb(255 255 255)",  // Button text
+    "--background": "rgb(17 24 39)",        // Background
+  } as React.CSSProperties}
+  backgroundImage="/game-bg.png"            // Your background
+/>
+```
+
+**2. Add background images:**
 
 Download two background images - one for the page and one for the game component:
 
-1. **Download page background**: Right-click → [page-bg.png](https://raw.githubusercontent.com/BetSwirl/ui-react-demo/main/public/page-bg.png) → "Save image as..."
-2. **Download game background**: Right-click → [game-bg.png](https://raw.githubusercontent.com/BetSwirl/ui-react-demo/main/public/game-bg.png) → "Save image as..."
-3. **Save both images** to the `public/` folder:
-   ```
-   betswirl-ui-react-demo/
-   ├── public/
-   │   ├── page-bg.png   ← Background for entire page
-   │   └── game-bg.png   ← Background for game component
-   ├── src/
-   └── ...
-   ```
+- **Page background**: [page-bg.png](https://raw.githubusercontent.com/BetSwirl/ui-react-demo/main/public/page-bg.png)
+- **Game background**: [game-bg.png](https://raw.githubusercontent.com/BetSwirl/ui-react-demo/main/public/game-bg.png)
 
-4. **Add page background style** to `src/index.css`:
+**Save both images** to the `public/` folder:
+```
+betswirl-ui-react-demo/
+├── public/
+│   ├── page-bg.png   ← Background for entire page
+│   └── game-bg.png   ← Background for game component
+├── src/
+└── ...
+```
+
+**3. Add page background style** to `src/index.css`:
 
 Open `src/index.css` and add these styles to the `body` section:
 
@@ -210,10 +242,6 @@ body {
   align-items: center;
 }
 ```
-
-**Note:**
-- `page-bg.png` = full page background (behind everything)
-- `game-bg.png` = game component background (behind betting panel and dice)
 
 ## Step 6: Run Your Casino
 
@@ -483,60 +511,38 @@ function App() {
 export default App
 ```
 
-### 🏆 Leaderboards Integration
+### 🏆 Leaderboard "Play now" Integration
 
-**What it does:** Game components already have leaderboards built-in with a "Play now" button. This enhancement makes the "Play now" button automatically switch to the correct game, chain, and token for that tournament (instead of just closing the leaderboard panel).
+**Why this is needed:** When a user is playing DiceGame but opens a leaderboard that requires CoinToss, the DiceGame component cannot switch itself to CoinTossGame. You need to handle game switching at a higher level.
 
-**Replace your `src/App.tsx` with:**
+The `onPlayNow` callback lets you respond when users click "Play now" in leaderboards. It receives a `PlayNowEvent`:
 
 ```tsx
-import { useState } from 'react'
-import { CASINO_GAME_TYPE, LEADERBOARD_CASINO_RULES_GAME } from '@betswirl/sdk-core'
-import { CoinTossGame, DiceGame, type PlayNowEvent } from '@betswirl/ui-react'
-
-export default function App() {
-  const [currentGame, setCurrentGame] = useState(CASINO_GAME_TYPE.DICE)
-
-  const handlePlayNow = (event: PlayNowEvent) => {
-    // Switch to the appropriate game
-    if (event.games.includes(LEADERBOARD_CASINO_RULES_GAME.COINTOSS)) {
-      setCurrentGame(CASINO_GAME_TYPE.COINTOSS)
-    } else if (event.games.includes(LEADERBOARD_CASINO_RULES_GAME.DICE)) {
-      setCurrentGame(CASINO_GAME_TYPE.DICE)
-    }
-    // You can also handle chain/token switching here
-  }
-
-  return (
-    <div>
-      {currentGame === CASINO_GAME_TYPE.COINTOSS && (
-        <CoinTossGame theme="dark" onPlayNow={handlePlayNow} />
-      )}
-      {currentGame === CASINO_GAME_TYPE.DICE && (
-        <DiceGame theme="dark" onPlayNow={handlePlayNow} />
-      )}
-    </div>
-  )
+type PlayNowEvent = {
+  chainId: CasinoChainId                    // Required network for the leaderboard
+  games: LEADERBOARD_CASINO_RULES_GAME[]    // Which games are allowed
+  tokens: Token[]                           // Which tokens are accepted
 }
 ```
 
-**Note:** The `LeaderboardProvider` is already configured in main.tsx (Step 3), so you only need to replace App.tsx with this code to enable leaderboards.
+**For multi-game apps:** This callback is required for "Play now" to work correctly. Without it, the button only closes the panel but doesn't switch to the correct game.
 
-### 🎨 Custom Branding
+**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in main.tsx, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
 
-Customize colors to match your brand:
+In `src/main.tsx`:
 
 ```tsx
-<DiceGame
-  theme="dark"
-  customTheme={{
-    "--primary": "rgb(59 130 246)",           // Your brand color
-    "--play-btn-font": "rgb(255 255 255)",    // Button text color
-    "--background": "rgb(17 24 39)",          // Background color
-  } as React.CSSProperties}
-  backgroundImage="/your-background.png"
-/>
+import { type PlayNowEvent } from '@betswirl/sdk-core'
+
+<LeaderboardProvider onPlayNow={(event: PlayNowEvent) => {
+  console.log('Leaderboard requires:', event.games)
+  console.log('On chain:', event.chainId)
+  console.log('With tokens:', event.tokens)
+  // TODO: Implement game switching based on your app architecture
+}}>
 ```
+
+**For production:** You'll need to implement proper game switching. This depends on your state management approach (Context, Redux, router, etc.).
 
 ---
 
