@@ -183,8 +183,22 @@ const meta = {
       demos: {
         title: "▶️ Demos",
         items: {
-          miniapp: {
-            title: "Farcaster Mini App",
+          "ui-react": {
+            title: "UI React",
+            items: {
+              miniapp: {
+                title: "Farcaster Mini App",
+              },
+              react: {
+                title: "React dApp",
+              },
+              "checking-available-tokens": {
+                title: "Checking Available Tokens",
+              },
+              "hosted-manifest-guide": {
+                title: "Farcaster Hosted Manifest Guide",
+              },
+            },
           },
           "node-cli": {
             title: "Node CLI",

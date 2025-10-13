@@ -44,7 +44,7 @@ npm i @betswirl/ui-react
 
 Replace the code in `app/providers.tsx` with:
 
-> **Note:** For information about available networks and tokens, see [How to Check Available Tokens](./checking-available-tokens).
+> **Note:** For information about available networks and tokens, see [How to Check Available Tokens](../checking-available-tokens).
 
 ```tsx
 "use client";
@@ -285,7 +285,7 @@ vercel login
 vercel --prod
 ```
 
-![Vercel deploy](./screenshots/vercel-deploy.png)
+![Vercel deploy](../screenshots/vercel-deploy.png)
 
 ### Git Integration
 * Sign in to [vercel.com](https://vercel.com) with GitHub
@@ -305,15 +305,15 @@ If you deploy to a new project, the domain will be created from the project's na
 
 **Find or edit an existing domain:**   
 
-1. Go to your project on Vercel   
-2. Open the **"Settings"** tab   
-![Settings](./screenshots/settings.png)
+1. Go to your project on Vercel
+2. Open the **"Settings"** tab
+![Settings](../screenshots/settings.png)
 
-3. Go to the **"Domains"** section      
-![Domains](./screenshots/domains.png)
+3. Go to the **"Domains"** section
+![Domains](../screenshots/domains.png)
 
-4. Click **"Edit"** next to your domain     
-![Edit domain](./screenshots/edit-domain.png)
+4. Click **"Edit"** next to your domain
+![Edit domain](../screenshots/edit-domain.png)
 
 5. Update your domain and click **"Save"**   
 
@@ -321,21 +321,21 @@ If you deploy to a new project, the domain will be created from the project's na
 
 Follow these steps to add [Environment Variables](#environment-variables) on Vercel:
 1. Go to your project on Vercel
-2. Open the **"Settings"** tab   
-![Settings](./screenshots/settings.png)
+2. Open the **"Settings"** tab
+![Settings](../screenshots/settings.png)
 
-3. Go to the **"Environments"** section      
-![Environments section](./screenshots/environments.png)
+3. Go to the **"Environments"** section
+![Environments section](../screenshots/environments.png)
 
-4. Select the **"Production"** domain   
-![Production domain](./screenshots/env-production.png)
+4. Select the **"Production"** domain
+![Production domain](../screenshots/env-production.png)
 
-5. Click **"Add Environment Variables"**   
-![Environment Variables](./screenshots/add-env-vars.png)
+5. Click **"Add Environment Variables"**
+![Environment Variables](../screenshots/add-env-vars.png)
 
-6. Add all [Environment variables](#environment-variables) at once by pasting them into the input field or importing your `.env` file to avoid adding them one by one. 
-Replace `$NEXT_PUBLIC_URL` with your public URL in all variables where it is used.   
-![Input environment variables](./screenshots/input-env-vars.png)
+6. Add all [Environment variables](#environment-variables) at once by pasting them into the input field or importing your `.env` file to avoid adding them one by one.
+Replace `$NEXT_PUBLIC_URL` with your public URL in all variables where it is used.
+![Input environment variables](../screenshots/input-env-vars.png)
 
 7. Click **"Save"**
 
@@ -345,8 +345,8 @@ If you added environment variables for the manifest in Vercel project settings a
 1. Go to your project dashboard in Vercel
 2. Click on the **"Deployments"** tab
 3. Select the latest deployment
-4. Click the **"Redeploy"**       
-![Redeploy](./screenshots/redeploy.png)
+4. Click the **"Redeploy"**
+![Redeploy](../screenshots/redeploy.png)
 
 ## Test Farcaster Mini App
 
@@ -362,15 +362,15 @@ If the manifest is valid, you'll see - `"Mini App configuration is valid."` in t
 
 You can launch the application by clicking the **Launch** button.
 
-![Testing Farcaster Mini App](./screenshots/launchMiniApp.png)
+![Testing Farcaster Mini App](../screenshots/launchMiniApp.png)
 
 If the manifest is not valid, check if you have correctly filled all required environment variables and redeployed after making changes.
 
-This message  - `"[your-app].vercel.app does not have a valid manifest setup."` appears if the domain is not associated with your account. It's not required for Farcaster Mini App rendering or testing.   
-![Testing Farcaster Mini App](./screenshots/notValidManifest.png)   
+This message  - `"[your-app].vercel.app does not have a valid manifest setup."` appears if the domain is not associated with your account. It's not required for Farcaster Mini App rendering or testing.
+![Testing Farcaster Mini App](../screenshots/notValidManifest.png)
 
 **Additional Information:**
-- [Hosted Manifest Guide](./hosted-manifest-guide)
+- [Hosted Manifest Guide](../hosted-manifest-guide)
 
 ## Post Your Farcaster Mini App
 
@@ -382,7 +382,7 @@ Account association links the domain to your account. After this, users will be 
 On the manifest page:
 1. Click the **"Generate account association"** button   
 
-![Account Association](./screenshots/account-association.png)   
+![Account Association](../screenshots/account-association.png)   
 
 2. On your phone, scan the provided QR code or go to the link - `https://farcaster.xyz/~/developers/register?domain=[your-app].vercel.app`.
 You should be redirected to the **"Account Association"** page in the Warpcast app for message signing.
@@ -431,4 +431,4 @@ For more information, see: [App Discovery & Search](https://miniapps.farcaster.x
 - [MiniKit Documentation](https://docs.base.org/wallet-app/build-with-minikit/quickstart)
 - [Farcaster Mini Apps Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
 - [Deploying to Vercel](https://vercel.com/docs/deployments)
-- [How to Check Available Tokens](./checking-available-tokens)
+- [How to Check Available Tokens](../checking-available-tokens)
