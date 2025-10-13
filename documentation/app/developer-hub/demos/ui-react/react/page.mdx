@@ -276,21 +276,9 @@ export default App
 
 #### Step 7: Leaderboard Integration
 
-**Why this is needed:** When a user is playing DiceGame but opens a leaderboard that requires CoinToss, the DiceGame component cannot switch itself to CoinTossGame. You need to handle game switching at a higher level.
+**Learn more:** [Leaderboard Integration](../configuration#leaderboard-integration)
 
-The `onPlayNow` callback lets you respond when users click "Play now" in leaderboards. It receives a `PlayNowEvent`:
-
-```tsx
-type PlayNowEvent = {
-  chainId: CasinoChainId                    // Required network for the leaderboard
-  games: LEADERBOARD_CASINO_RULES_GAME[]    // Which games are allowed
-  tokens: Token[]                           // Which tokens are accepted
-}
-```
-
-**For multi-game apps:** This callback is required for "Play now" to work correctly. Without it, the button only closes the panel but doesn't switch to the correct game.
-
-**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in main.tsx, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
+**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in `src/main.tsx`, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
 
 In `src/main.tsx`:
 
@@ -305,24 +293,9 @@ import { type PlayNowEvent } from '@betswirl/ui-react'
 }}>
 ```
 
-**For production:** You'll need to implement proper game switching. This depends on your state management approach (Context, Redux, router, etc.).
-
 #### Step 8: Custom Branding
 
-Customize theme, colors and backgrounds to match your brand.
-
-**Available customization options:**
-
-**Theme:** Choose between `"light"`, `"dark"`, or `"system"` (auto-detects user preference)
-
-**Colors you can customize:**
-- `--primary` - Main brand color (buttons, highlights)
-- `--play-btn-font` - Text color on Play button
-- `--connect-btn-font` - Text color on Connect Wallet button
-- `--game-window-overlay` - Overlay color for game window
-- `--background` - Background color
-
-**Background image:** Any image URL or local file from `public/` folder
+**Learn more:** [Custom Branding](../configuration#custom-branding)
 
 **1. Add background images:**
 
@@ -637,114 +610,7 @@ The base setup above gives you a fully functional casino. Below are optional fea
 
 ## Configuration Reference
 
-This section explains all parameters you can configure in `BetSwirlSDKProvider`.
-
-### Required Parameters
-
-#### `initialChainId`
-
-**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
-
-**What it does:** Sets which blockchain network your app starts on when the page loads.
-
-**Accepted values:**
-- `base.id` (8453) - Base mainnet
-- `polygon.id` (137) - Polygon mainnet
-- `arbitrum.id` (42161) - Arbitrum mainnet
-- `avalanche.id` (43114) - Avalanche mainnet
-- `bsc.id` (56) - BSC mainnet
-
-**Example:**
-```tsx
-<BetSwirlSDKProvider initialChainId={base.id}>
-```
-
-#### `supportedChains`
-
-**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
-
-**What it does:** Defines which blockchain networks users can switch between in your app. Must match the chains you configured in wagmi.
-
-**Accepted values:** Array of chain IDs - must be the same chains you set up in `createConfig`
-
-**Example:**
-```tsx
-// In wagmi config
-const config = createConfig({
-  chains: [base, polygon, arbitrum],
-  // ...
-})
-
-// In BetSwirlSDKProvider - use the SAME chains
-<BetSwirlSDKProvider
-  supportedChains={[base.id, polygon.id, arbitrum.id]}
->
-```
-
-### Optional Parameters
-
-#### `affiliate`
-
-**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
-
-**What it does:** Your wallet address to earn 30% commission from all bets placed through your casino.
-
-**Accepted values:** Any valid Ethereum wallet address (starts with `0x`)
-
-**Best practice:** Use environment variable instead of hardcoding
-
-**Example:**
-```tsx
-// Read from environment variable (recommended)
-const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS
-
-<BetSwirlSDKProvider affiliate={affiliateAddress}>
-```
-
-#### `bankrollToken`
-
-**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
-
-**What it does:** Sets which token is selected by default when the game loads.
-
-**Accepted values:** A `TokenWithImage` object with these properties:
-- `address` - Token contract address (use `0x0000...0000` for native token like ETH)
-- `symbol` - Token name (e.g., "ETH", "DEGEN", "USDC")
-- `decimals` - Usually 18 (or 6 for USDC)
-- `image` - URL to token icon
-
-**Example:**
-```tsx
-const DEGEN_TOKEN = {
-  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
-  symbol: "DEGEN",
-  decimals: 18,
-  image: "https://www.betswirl.com/img/tokens/DEGEN.svg"
-}
-
-<BetSwirlSDKProvider bankrollToken={DEGEN_TOKEN}>
-```
-
-#### `filteredTokens`
-
-**Where to add:** In `src/main.tsx`, inside `<BetSwirlSDKProvider>`
-
-**What it does:** Limits which tokens users can select for betting. Without this, all supported tokens will be available.
-
-**Accepted values:** Array of token contract addresses
-
-**Why use it:** Simplify UI by showing only popular tokens
-
-**Example:**
-```tsx
-const ALLOWED_TOKENS = [
-  "0x0000000000000000000000000000000000000000", // ETH
-  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC
-  "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed", // DEGEN
-]
-
-<BetSwirlSDKProvider filteredTokens={ALLOWED_TOKENS}>
-```
+For detailed information about all `BetSwirlSDKProvider` parameters, see the [Configuration Reference](../configuration).
 
 ---
 

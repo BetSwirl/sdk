@@ -1,0 +1,194 @@
+# Configuration Reference
+
+This guide explains all parameters you can configure in `BetSwirlSDKProvider`.
+
+## Required Parameters
+
+### `initialChainId`
+
+**What it does:** Sets which blockchain network your app starts on when the page loads.
+
+**Accepted values:**
+- `base.id` (8453) - Base mainnet
+- `polygon.id` (137) - Polygon mainnet
+- `arbitrum.id` (42161) - Arbitrum mainnet
+- `avalanche.id` (43114) - Avalanche mainnet
+- `bsc.id` (56) - BSC mainnet
+
+**Example:**
+```tsx
+<BetSwirlSDKProvider initialChainId={base.id}>
+```
+
+### `supportedChains`
+
+**What it does:** Defines which blockchain networks users can switch between in your app. Must match the chains you configured in wagmi.
+
+**Accepted values:** Array of chain IDs - must be the same chains you set up in `createConfig`
+
+**Example:**
+```tsx
+// In wagmi config
+const config = createConfig({
+  chains: [base, polygon, arbitrum],
+  // ...
+})
+
+// In BetSwirlSDKProvider - use the SAME chains
+<BetSwirlSDKProvider
+  supportedChains={[base.id, polygon.id, arbitrum.id]}
+>
+```
+
+## Optional Parameters
+
+### `affiliate`
+
+**What it does:** Your wallet address to earn 30% commission from all bets placed through your casino.
+
+**Accepted values:** Any valid Ethereum wallet address (starts with `0x`)
+
+**Best practice:** Use environment variable instead of hardcoding
+
+**Example for React (Vite):**
+```tsx
+// Read from environment variable (recommended)
+const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS
+
+<BetSwirlSDKProvider affiliate={affiliateAddress}>
+```
+
+**Example for Next.js:**
+```tsx
+// Read from environment variable (recommended)
+const affiliateAddress = process.env.NEXT_PUBLIC_AFFILIATE_ADDRESS
+
+<BetSwirlSDKProvider affiliate={affiliateAddress}>
+```
+
+### `bankrollToken`
+
+**What it does:** Sets which token is selected by default when the game loads.
+
+**Accepted values:** A `TokenWithImage` object with these properties:
+- `address` - Token contract address (use `0x0000...0000` for native token like ETH)
+- `symbol` - Token name (e.g., "ETH", "DEGEN", "USDC")
+- `decimals` - Usually 18 (or 6 for USDC)
+- `image` - URL to token icon
+
+**Example:**
+```tsx
+const DEGEN_TOKEN = {
+  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
+  symbol: "DEGEN",
+  decimals: 18,
+  image: "https://www.betswirl.com/img/tokens/DEGEN.svg"
+}
+
+<BetSwirlSDKProvider bankrollToken={DEGEN_TOKEN}>
+```
+
+### `filteredTokens`
+
+**What it does:** Limits which tokens users can select for betting. Without this, all supported tokens will be available.
+
+**Accepted values:** Array of token contract addresses
+
+**Why use it:** Simplify UI by showing only popular tokens
+
+**Example:**
+```tsx
+const ALLOWED_TOKENS = [
+  "0x0000000000000000000000000000000000000000", // ETH
+  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC
+  "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed", // DEGEN
+]
+
+<BetSwirlSDKProvider filteredTokens={ALLOWED_TOKENS}>
+```
+
+## Leaderboard Integration
+
+**Why this is needed:** When a user is playing DiceGame but opens a leaderboard that requires CoinToss, the DiceGame component cannot switch itself to CoinTossGame. You need to handle game switching at a higher level.
+
+### The onPlayNow Callback
+
+The `onPlayNow` callback lets you respond when users click "Play now" in leaderboards. It receives a `PlayNowEvent`:
+
+```tsx
+type PlayNowEvent = {
+  chainId: CasinoChainId                    // Required network for the leaderboard
+  games: LEADERBOARD_CASINO_RULES_GAME[]    // Which games are allowed
+  tokens: Token[]                           // Which tokens are accepted
+}
+```
+
+**For multi-game apps:** This callback is required for "Play now" to work correctly. Without it, the button only closes the panel but doesn't switch to the correct game.
+
+**For production:** You'll need to implement proper game switching. This depends on your state management approach (Context, Redux, router, etc.).
+
+### Example Implementation
+
+The simplest approach is to log the event data during development:
+
+```tsx
+import { type PlayNowEvent } from '@betswirl/ui-react'
+
+<LeaderboardProvider onPlayNow={(event: PlayNowEvent) => {
+  console.log('Leaderboard requires:', event.games)
+  console.log('On chain:', event.chainId)
+  console.log('With tokens:', event.tokens)
+  // TODO: Implement game switching based on your app architecture
+}}>
+  {children}
+</LeaderboardProvider>
+```
+
+### State Management Considerations
+
+Since game state is typically in your main App component but `LeaderboardProvider` is in the providers file, you have several options:
+
+1. **Context API**: Create a game context to share state across components
+2. **State Management Library**: Use Redux, Zustand, or similar
+3. **URL-based routing**: Use React Router and switch games via URL changes
+4. **Event emitter**: Use a custom event system to communicate between components
+
+Choose the approach that best fits your application architecture.
+
+## Custom Branding
+
+Customize theme, colors and backgrounds to match your brand.
+
+### Theme
+
+Choose between `"light"`, `"dark"`, or `"system"` (auto-detects user preference)
+
+### Colors
+
+You can customize these CSS variables:
+- `--primary` - Main brand color (buttons, highlights)
+- `--play-btn-font` - Text color on Play button
+- `--connect-btn-font` - Text color on Connect Wallet button
+- `--game-window-overlay` - Overlay color for game window
+- `--background` - Background color
+
+### Background Images
+
+Any image URL or local file from `public/` folder
+
+### Example Configuration
+
+```tsx
+const gameProps = {
+  theme: "dark" as const,
+  customTheme: {
+    "--primary": "rgb(225 159 31)",
+    "--play-btn-font": "rgb(74 41 24)",
+  } as React.CSSProperties,
+  backgroundImage: "/game-bg.png",
+}
+
+<DiceGame {...gameProps} />
+<CoinTossGame {...gameProps} />
+<RouletteGame {...gameProps} />
+```

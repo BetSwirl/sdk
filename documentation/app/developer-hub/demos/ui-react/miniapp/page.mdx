@@ -126,30 +126,7 @@ export function Providers(props: { children: ReactNode }) {
 }
 ```
 
-#### Step 3: Add Affiliate Address
-
-Add your affiliate address to earn **30% of house edge revenue** from every bet placed through your app.
-
-Update `app/providers.tsx` - add this line at the top of the file with other constants:
-
-```tsx
-const affiliateAddress = process.env.NEXT_PUBLIC_AFFILIATE_ADDRESS
-```
-
-Then add `affiliate` prop to `BetSwirlSDKProvider`:
-
-```tsx
-<BetSwirlSDKProvider
-  initialChainId={base.id}
-  supportedChains={SUPPORTED_CHAIN_IDS}
-  affiliate={affiliateAddress}  // Add this line
-  // ... other props
->
-```
-
-**Learn more:** [Affiliate Program](/protocol-hub/partners/affiliates) - track earnings, create freebets, manage leaderboards, and claim revenue.
-
-#### Step 4: Add Game Component
+#### Step 3: Add Game Component
 
 Add the game component in `app/page.tsx`:
 
@@ -230,6 +207,29 @@ npm run dev
 
 Open `http://localhost:3000/` to connect wallet and place bets.
 
+#### Step 4: Add Affiliate Address
+
+Add your affiliate address to earn **30% of house edge revenue** from every bet placed through your app.
+
+Update `app/providers.tsx` - add this line at the top of the file with other constants:
+
+```tsx
+const affiliateAddress = process.env.NEXT_PUBLIC_AFFILIATE_ADDRESS
+```
+
+Then add `affiliate` prop to `BetSwirlSDKProvider`:
+
+```tsx
+<BetSwirlSDKProvider
+  initialChainId={base.id}
+  supportedChains={SUPPORTED_CHAIN_IDS}
+  affiliate={affiliateAddress}  // Add this line
+  // ... other props
+>
+```
+
+**Learn more:** [Affiliate Program](/protocol-hub/partners/affiliates) - track earnings, create freebets, manage leaderboards, and claim revenue.
+
 #### Step 5: Add Multiple Games
 
 Add more games and navigation to let users switch between them.
@@ -299,21 +299,9 @@ Replace the `<main>` section with navigation and conditional game rendering:
 
 #### Step 6: Leaderboard Integration
 
-**Why this is needed:** When a user is playing DiceGame but opens a leaderboard that requires CoinToss, the DiceGame component cannot switch itself to CoinTossGame. You need to handle game switching at a higher level.
+**Learn more:** [Leaderboard Integration](../configuration#leaderboard-integration)
 
-The `onPlayNow` callback lets you respond when users click "Play now" in leaderboards. It receives a `PlayNowEvent`:
-
-```tsx
-type PlayNowEvent = {
-  chainId: CasinoChainId                    // Required network for the leaderboard
-  games: LEADERBOARD_CASINO_RULES_GAME[]    // Which games are allowed
-  tokens: Token[]                           // Which tokens are accepted
-}
-```
-
-**For multi-game apps:** This callback is required for "Play now" to work correctly. Without it, the button only closes the panel but doesn't switch to the correct game.
-
-**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in providers.tsx, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
+**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in `app/providers.tsx`, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
 
 **1. Update `app/providers.tsx` - add import at the top:**
 
@@ -342,24 +330,9 @@ To:
 </LeaderboardProvider>
 ```
 
-**For production:** You'll need to implement proper game switching. This depends on your state management approach (Context, Redux, router, etc.).
-
 #### Step 7: Custom Branding
 
-Customize theme, colors and backgrounds to match your brand.
-
-**Available customization options:**
-
-**Theme:** Choose between `"light"`, `"dark"`, or `"system"` (auto-detects user preference)
-
-**Colors you can customize:**
-- `--primary` - Main brand color (buttons, highlights)
-- `--play-btn-font` - Text color on Play button
-- `--connect-btn-font` - Text color on Connect Wallet button
-- `--game-window-overlay` - Overlay color for game window
-- `--background` - Background color
-
-**Background image:** Any image URL or local file from `public/` folder
+**Learn more:** [Custom Branding](../configuration#custom-branding)
 
 **1. Add background images (optional):**
 
@@ -708,6 +681,7 @@ For more information, see: [App Discovery & Search](https://miniapps.farcaster.x
 
 ## Documentation
 
+- [Configuration Reference](../configuration) - All BetSwirlSDKProvider parameters, Leaderboard Integration, Custom Branding
 - [MiniKit Documentation](https://docs.base.org/wallet-app/build-with-minikit/quickstart)
 - [Farcaster Mini Apps Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
 - [Deploying to Vercel](https://vercel.com/docs/deployments)
