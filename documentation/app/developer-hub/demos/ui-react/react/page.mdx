@@ -158,6 +158,8 @@ createRoot(document.getElementById('root')!).render(
 )
 ```
 
+> **Note:** For information about available networks and tokens, see [How to Check Available Tokens](../checking-available-tokens).
+
 **What's happening here:**
 - **Wagmi & React Query**: Manage blockchain connections and data fetching
 - **OnchainKit**: Provides wallet connection UI
@@ -166,7 +168,29 @@ createRoot(document.getElementById('root')!).render(
 - **Custom RPCs**: Fallback to default public RPCs if env variables not set
 - **Token filtering**: Limits available tokens to DEGEN, ETH, USDC, and BETS (you can change this list or remove to show all tokens - see [Configuration](#configuration) section below)
 
-#### Step 4: Add Affiliate Address
+#### Step 4: Add Game Component
+
+Replace the entire content of `src/App.tsx` with:
+
+```tsx
+import {DiceGame} from '@betswirl/ui-react'
+
+function App() {
+    return <DiceGame />
+}
+
+export default App
+```
+
+You can test it now:
+
+```shell
+npm run dev
+```
+
+Open `http://localhost:5173` to connect wallet and place bets.
+
+#### Step 5: Add Affiliate Address
 
 Add your affiliate address to earn **30% of house edge revenue** from every bet placed through your app.
 
@@ -189,36 +213,101 @@ Then add `affiliate` prop to `BetSwirlSDKProvider`:
 
 **Learn more:** [Affiliate Program](/protocol-hub/partners/affiliates) - track earnings, create freebets, manage leaderboards, and claim revenue.
 
-#### Step 5: Add Game Component
+#### Step 6: Add Multiple Games
 
-Replace the entire content of `src/App.tsx` with:
+Add navigation to switch between Dice, Coin Toss, and Roulette.
+
+**1. Fix button styles in `src/index.css`:**
+
+Find the `button` section and replace with:
+
+```css
+button {
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+button:focus-visible {
+  outline: 2px solid rgba(225, 159, 31, 0.5);
+  outline-offset: 2px;
+}
+```
+
+**2. Update `src/App.tsx`:**
+
+Replace the entire file with:
 
 ```tsx
-import {DiceGame} from '@betswirl/ui-react'
+import { useState } from 'react'
+import { CoinTossGame, DiceGame, RouletteGame } from '@betswirl/ui-react'
 
 function App() {
-    return (
-        <DiceGame
-            theme="dark"
-            customTheme={{
-                "--primary": "rgb(225 159 31)",
-                "--play-btn-font": "rgb(74 41 24)",
-            } as React.CSSProperties}
-            backgroundImage="/game-bg.png"
-        />
-    )
+  const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+
+  return (
+    <div>
+      <nav style={{
+        display: 'flex',
+        gap: '8px',
+        justifyContent: 'center',
+        padding: '12px 0',
+        marginBottom: '12px',
+      }}>
+        {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+          <button
+            key={g}
+            onClick={() => setGame(g)}
+            disabled={game === g}
+          >
+            {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+          </button>
+        ))}
+      </nav>
+
+      {game === 'dice' && <DiceGame />}
+      {game === 'cointoss' && <CoinTossGame />}
+      {game === 'roulette' && <RouletteGame />}
+    </div>
+  )
 }
 
 export default App
 ```
 
-**What's happening here:**
-- **DiceGame component**: Fully functional dice game with betting panel
-- **Dark theme**: Dark mode interface
-- **Custom colors**: Gold primary color (`rgb(225 159 31)`) and dark brown button text
-- **Background image**: Will add in next step
+#### Step 7: Leaderboard Integration
 
-#### Step 6: Custom Branding
+**Why this is needed:** When a user is playing DiceGame but opens a leaderboard that requires CoinToss, the DiceGame component cannot switch itself to CoinTossGame. You need to handle game switching at a higher level.
+
+The `onPlayNow` callback lets you respond when users click "Play now" in leaderboards. It receives a `PlayNowEvent`:
+
+```tsx
+type PlayNowEvent = {
+  chainId: CasinoChainId                    // Required network for the leaderboard
+  games: LEADERBOARD_CASINO_RULES_GAME[]    // Which games are allowed
+  tokens: Token[]                           // Which tokens are accepted
+}
+```
+
+**For multi-game apps:** This callback is required for "Play now" to work correctly. Without it, the button only closes the panel but doesn't switch to the correct game.
+
+**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in main.tsx, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
+
+In `src/main.tsx`:
+
+```tsx
+import { type PlayNowEvent } from '@betswirl/ui-react'
+
+<LeaderboardProvider onPlayNow={(event: PlayNowEvent) => {
+  console.log('Leaderboard requires:', event.games)
+  console.log('On chain:', event.chainId)
+  console.log('With tokens:', event.tokens)
+  // TODO: Implement game switching based on your app architecture
+}}>
+```
+
+**For production:** You'll need to implement proper game switching. This depends on your state management approach (Context, Redux, router, etc.).
+
+#### Step 8: Custom Branding
 
 Customize theme, colors and backgrounds to match your brand.
 
@@ -235,21 +324,7 @@ Customize theme, colors and backgrounds to match your brand.
 
 **Background image:** Any image URL or local file from `public/` folder
 
-**1. Customize theme and colors - update your `src/App.tsx`:**
-
-```tsx
-<DiceGame
-  theme="dark"                              // or "light" or "system"
-  customTheme={{
-    "--primary": "rgb(59 130 246)",         // Brand color
-    "--play-btn-font": "rgb(255 255 255)",  // Button text
-    "--background": "rgb(17 24 39)",        // Background
-  } as React.CSSProperties}
-  backgroundImage="/game-bg.png"            // Your background
-/>
-```
-
-**2. Add background images:**
+**1. Add background images:**
 
 Download two background images - one for the page and one for the game component:
 
@@ -266,7 +341,143 @@ betswirl-ui-react-demo/
 └── ...
 ```
 
-**3. Add page background style** to `src/index.css`:
+**2. Customize game components** in your `src/App.tsx`:
+
+Add theme, colors, and background image to all game components:
+
+```tsx
+{game === 'dice' && (
+  <DiceGame
+    theme="dark"
+    customTheme={{
+      "--primary": "rgb(225 159 31)",
+      "--play-btn-font": "rgb(74 41 24)",
+    } as React.CSSProperties}
+    backgroundImage="/game-bg.png"
+  />
+)}
+{game === 'cointoss' && (
+  <CoinTossGame
+    theme="dark"
+    customTheme={{
+      "--primary": "rgb(225 159 31)",
+      "--play-btn-font": "rgb(74 41 24)",
+    } as React.CSSProperties}
+    backgroundImage="/game-bg.png"
+  />
+)}
+{game === 'roulette' && (
+  <RouletteGame
+    theme="dark"
+    customTheme={{
+      "--primary": "rgb(225 159 31)",
+      "--play-btn-font": "rgb(74 41 24)",
+    } as React.CSSProperties}
+    backgroundImage="/game-bg.png"
+  />
+)}
+```
+
+Or use a more compact version with shared props:
+
+```tsx
+const gameProps = {
+  theme: "dark" as const,
+  customTheme: {
+    "--primary": "rgb(225 159 31)",
+    "--play-btn-font": "rgb(74 41 24)",
+  } as React.CSSProperties,
+  backgroundImage: "/game-bg.png",
+}
+
+{game === 'dice' && <DiceGame {...gameProps} />}
+{game === 'cointoss' && <CoinTossGame {...gameProps} />}
+{game === 'roulette' && <RouletteGame {...gameProps} />}
+```
+
+**Your complete `src/App.tsx` should look like this:**
+
+```tsx
+import { useState } from 'react'
+import { CoinTossGame, DiceGame, RouletteGame } from '@betswirl/ui-react'
+
+function App() {
+  const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+
+  const gameProps = {
+    theme: "dark" as const,
+    customTheme: {
+      "--primary": "rgb(225 159 31)",
+      "--play-btn-font": "rgb(74 41 24)",
+    } as React.CSSProperties,
+    backgroundImage: "/game-bg.png",
+  }
+
+  return (
+    <div>
+      <nav style={{
+        display: 'flex',
+        gap: '8px',
+        justifyContent: 'center',
+        padding: '12px 0',
+        marginBottom: '12px',
+      }}>
+        {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+          <button
+            key={g}
+            onClick={() => setGame(g)}
+            disabled={game === g}
+          >
+            {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+          </button>
+        ))}
+      </nav>
+
+      {game === 'dice' && <DiceGame {...gameProps} />}
+      {game === 'cointoss' && <CoinTossGame {...gameProps} />}
+      {game === 'roulette' && <RouletteGame {...gameProps} />}
+    </div>
+  )
+}
+
+export default App
+```
+
+**3. Style navigation buttons:**
+
+Replace the `<nav>` section in `src/App.tsx` with custom styled buttons:
+
+```tsx
+<nav style={{
+  display: 'flex',
+  gap: '8px',
+  justifyContent: 'center',
+  padding: '12px 0',
+  marginBottom: '12px',
+}}>
+  {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+    <button
+      key={g}
+      onClick={() => setGame(g)}
+      style={{
+        padding: '8px 16px',
+        background: game === g ? 'rgb(225 159 31)' : 'rgba(255, 255, 255, 0.05)',
+        color: game === g ? 'rgb(74 41 24)' : 'rgba(255, 255, 255, 0.6)',
+        border: game === g ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '6px',
+        fontSize: '14px',
+        fontWeight: '500',
+        transition: 'all 0.2s',
+        outline: 'none',
+      }}
+    >
+      {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+    </button>
+  ))}
+</nav>
+```
+
+**4. Add page background style** to `src/index.css`:
 
 Open `src/index.css` and add these styles to the `body` section:
 
@@ -292,7 +503,7 @@ body {
 }
 ```
 
-#### Step 7: Run Your Casino
+#### Step 9: Run Your Casino
 
 ```shell
 npm run dev
@@ -300,7 +511,7 @@ npm run dev
 
 Open in browser `http://localhost:5173`
 
-#### Step 8: Push to GitHub
+#### Step 10: Push to GitHub
 
 Before deploying, you need to push your code to GitHub.
 
@@ -421,172 +632,6 @@ Once deployed, track your affiliate revenue:
 
 The base setup above gives you a fully functional casino. Below are optional features you can add to enhance your application.
 
-### 🎮 Multiple Games
-
-Add more games and let users switch between them.
-
-**First, fix button styles in `src/index.css`:**
-
-Find the `button` styles and replace the entire block with:
-
-```css
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
-button:focus-visible {
-  outline: 2px solid rgba(225, 159, 31, 0.5);
-  outline-offset: 2px;
-}
-```
-
-This removes Vite's default gray backgrounds and blue borders that would conflict with navigation styling.
-
-**Then update your `src/App.tsx`:**
-
-**1. Add imports** at the top:
-
-Add `useState` from React:
-```tsx
-import { useState } from 'react'
-```
-
-Update your BetSwirl import to include more games:
-```tsx
-// Change this:
-import { DiceGame } from '@betswirl/ui-react'
-
-// To this:
-import { CoinTossGame, DiceGame, RouletteGame } from '@betswirl/ui-react'
-```
-
-**2. Add state** inside your App function (before the return):
-
-```tsx
-const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
-```
-
-**3. Wrap your existing game** with navigation:
-
-```tsx
-return (
-  <div>
-    {/* Navigation buttons */}
-    <nav style={{
-      display: 'flex',
-      gap: '8px',
-      justifyContent: 'center',
-      padding: '12px 0',
-      marginBottom: '12px',
-    }}>
-      {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
-        <button
-          key={g}
-          onClick={() => setGame(g)}
-          style={{
-            padding: '8px 16px',
-            background: game === g ? 'rgb(225 159 31)' : 'rgba(255, 255, 255, 0.05)',
-            color: game === g ? 'rgb(74 41 24)' : 'rgba(255, 255, 255, 0.6)',
-            border: game === g ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '6px',
-            fontSize: '14px',
-            fontWeight: '500',
-            transition: 'all 0.2s',
-          }}
-        >
-          {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
-        </button>
-      ))}
-    </nav>
-
-    {/* Games - keep your existing props (theme, customTheme, backgroundImage, etc.) */}
-    {game === 'dice' && <DiceGame /* ...your existing props */ />}
-    {game === 'cointoss' && <CoinTossGame /* ...your existing props */ />}
-    {game === 'roulette' && <RouletteGame /* ...your existing props */ />}
-  </div>
-)
-```
-
-**Full example** if you have the default setup from Step 4:
-
-```tsx
-import { useState } from 'react'
-import { CoinTossGame, DiceGame, RouletteGame } from '@betswirl/ui-react'
-
-function App() {
-  const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
-
-  return (
-    <div>
-      <nav style={{
-        display: 'flex',
-        gap: '8px',
-        justifyContent: 'center',
-        padding: '12px 0',
-        marginBottom: '12px',
-      }}>
-        {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
-          <button
-            key={g}
-            onClick={() => setGame(g)}
-            style={{
-              padding: '8px 16px',
-              background: game === g ? 'rgb(225 159 31)' : 'rgba(255, 255, 255, 0.05)',
-              color: game === g ? 'rgb(74 41 24)' : 'rgba(255, 255, 255, 0.6)',
-              border: game === g ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-            }}
-          >
-            {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
-          </button>
-        ))}
-      </nav>
-
-      {game === 'dice' && <DiceGame theme="dark" customTheme={{ "--primary": "rgb(225 159 31)", "--play-btn-font": "rgb(74 41 24)" } as React.CSSProperties} backgroundImage="/game-bg.png" />}
-      {game === 'cointoss' && <CoinTossGame theme="dark" customTheme={{ "--primary": "rgb(225 159 31)", "--play-btn-font": "rgb(74 41 24)" } as React.CSSProperties} backgroundImage="/game-bg.png" />}
-      {game === 'roulette' && <RouletteGame theme="dark" customTheme={{ "--primary": "rgb(225 159 31)", "--play-btn-font": "rgb(74 41 24)" } as React.CSSProperties} backgroundImage="/game-bg.png" />}
-    </div>
-  )
-}
-
-export default App
-```
-
-### 🏆 Leaderboard "Play now" Integration
-
-**Why this is needed:** When a user is playing DiceGame but opens a leaderboard that requires CoinToss, the DiceGame component cannot switch itself to CoinTossGame. You need to handle game switching at a higher level.
-
-The `onPlayNow` callback lets you respond when users click "Play now" in leaderboards. It receives a `PlayNowEvent`:
-
-```tsx
-type PlayNowEvent = {
-  chainId: CasinoChainId                    // Required network for the leaderboard
-  games: LEADERBOARD_CASINO_RULES_GAME[]    // Which games are allowed
-  tokens: Token[]                           // Which tokens are accepted
-}
-```
-
-**For multi-game apps:** This callback is required for "Play now" to work correctly. Without it, the button only closes the panel but doesn't switch to the correct game.
-
-**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in main.tsx, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
-
-In `src/main.tsx`:
-
-```tsx
-import { type PlayNowEvent } from '@betswirl/sdk-core'
-
-<LeaderboardProvider onPlayNow={(event: PlayNowEvent) => {
-  console.log('Leaderboard requires:', event.games)
-  console.log('On chain:', event.chainId)
-  console.log('With tokens:', event.tokens)
-  // TODO: Implement game switching based on your app architecture
-}}>
-```
-
-**For production:** You'll need to implement proper game switching. This depends on your state management approach (Context, Redux, router, etc.).
 
 ---
 
