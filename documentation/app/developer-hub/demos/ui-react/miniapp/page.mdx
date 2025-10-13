@@ -452,10 +452,9 @@ Your Farcaster Mini App is ready with the following features already configured:
 
 - **If you are creating a new project**, you can add the environment variables after the initial deployment. Go to the deployment step - [Deploy to Vercel](#deploy-to-vercel).
 
->⚠️ **Security note**: The manifest file is publicly accessible at `/.well-known/farcaster.json`. Never store sensitive data in manifest environment variables.
+> **Note:** The manifest file is publicly accessible at `/.well-known/farcaster.json`. Never store sensitive data in manifest environment variables.
 
->**How manifest generation works:**
->The manifest is generated during build through api route `app/.well-known/farcaster.json/route.ts`. This endpoint reads environment variables and returns JSON with your mini-app configuration for Farcaster.
+> **Note:** The manifest is generated during build through api route `app/.well-known/farcaster.json/route.ts`. This endpoint reads environment variables and returns JSON with your mini-app configuration for Farcaster.
 
 You can find a template with the environment variables in `.env.example`, or in `.env` if you set up the project from scratch.
 
