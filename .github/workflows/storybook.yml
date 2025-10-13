@@ -49,7 +49,7 @@ jobs:
           retention-days: 30
 
       - name: Run Ansible playbook
-        uses: dawidd6/action-ansible-playbook@v4
+        uses: dawidd6/action-ansible-playbook@v5
         with:
           playbook: .github/ansible/deploy.yml
           configuration: |
