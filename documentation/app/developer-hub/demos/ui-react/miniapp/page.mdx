@@ -37,8 +37,11 @@ npx create-onchain --mini
 # ═════════════════════════════════════════════════════════════════════
 # ? Enter your Coinbase Developer Platform Client API Key: (optional) ›
 # ═════════════════════════════════════════════════════════════════════
-# > Skip this (press Enter) - optional for mini-app
-# If needed later, add to .env: `NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_api_key`
+# > Press Enter to skip - NOT needed for casino app
+# (Only required for OnchainKit swap/NFT features, which we don't use)
+#
+# ? Share anonymous usage data to help improve create-onchain? › no / yes
+# > Choose any - doesn't affect your app functionality
 
 cd your-mini-project
 
@@ -101,7 +104,6 @@ export function Providers(props: { children: ReactNode }) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <MiniKitProvider
-          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
           chain={base}
           config={onChainKitConfig}
         >
@@ -481,9 +483,8 @@ NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
 
 **Optional variables:**
 ```bash
-# Shared/OnchainKit variables
+# Shared variables
 NEXT_PUBLIC_ICON_URL=$NEXT_PUBLIC_URL/logo.png
-NEXT_PUBLIC_ONCHAINKIT_API_KEY=
 
 # Optional Frame metadata items
 NEXT_PUBLIC_APP_TAGLINE=
