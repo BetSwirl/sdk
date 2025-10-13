@@ -45,7 +45,6 @@ const queryClient = new QueryClient({
 
 export function AppProviders({ children, onLeaderboardPlayNow }: AppProvidersProps) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
-  const freebetsAffiliates = affiliate ? [affiliate] : undefined
   const testMode = import.meta.env.VITE_TEST_MODE === "true"
 
   // --- Dynamic network configuration ---
@@ -103,7 +102,6 @@ export function AppProviders({ children, onLeaderboardPlayNow }: AppProvidersPro
             initialChainId={defaultChain.id}
             affiliate={affiliate}
             supportedChains={activeChains.map((chain) => chain.id)}
-            freebetsAffiliates={freebetsAffiliates}
             withExternalBankrollFreebets={true}
             testMode={testMode}
           >

@@ -1,5 +1,59 @@
 # @betswirl/ui-react
 
+## 0.2.7
+
+### Patch Changes
+
+- Fix claim freebet code parsing
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.26
+  - @betswirl/sdk-core@0.1.26
+
+## 0.2.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.25
+  - @betswirl/wagmi-provider@0.1.25
+
+## 0.2.5
+
+### Patch Changes
+
+- Fix claim freebet code APi call body
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.24
+  - @betswirl/sdk-core@0.1.24
+
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.23
+  - @betswirl/sdk-core@0.1.23
+
+## 0.2.3
+
+### Patch Changes
+
+- Fix bet status check, simplify affiliate API
+
+## 0.2.2
+
+### Patch Changes
+
+- Make testMode prop optional with default false value
+
+## 0.2.0
+
+### Minor Changes
+
+- Added leaderboards with user rankings and freebet rewards system
+
 ## 0.1.18
 
 ### Patch Changes

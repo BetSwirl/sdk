@@ -111,6 +111,7 @@ createRoot(document.getElementById('root')!).render(
           <BetSwirlSDKProvider
             initialChainId={base.id}
             supportedChains={[base.id, polygon.id, arbitrum.id]}
+            affiliates={["0xYourAffiliateAddress"]} // Optional: affiliate addresses for commissions, leaderboards and freebets
             bankrollToken={DEGEN_TOKEN}     // Optional: set default betting token
             filteredTokens={ALLOWED_TOKENS} // Optional: limit available tokens
           >
@@ -221,7 +222,7 @@ type PlayNowEvent = {
 |------|------|-------------|
 | `initialChainId` | `number` | **Required.** Chain ID to initialize the SDK with |
 | `supportedChains` | `number[]` | **Required.** Array of chain IDs to enable multi-chain support. Must include at least one supported chain ID |
-| `affiliate` | `string` | Optional. Your wallet address to receive affiliate commissions. If not provided, default affiliate will be used |
+| `affiliates` | `string[]` | Optional. Array of affiliate wallet addresses. The first address in the array will be used for receiving betting commissions, and the full array will be used for freebet requests. If not provided, default affiliates will be used for each supported chain |
 | `bankrollToken` | `TokenWithImage` | Optional. Default token for betting. Must include `address`, `symbol`, `decimals`, and `image` properties. [See available tokens →](./checking-available-tokens.md) |
 | `filteredTokens` | `string[]` | Optional. Array of token addresses to limit which tokens are available for selection. If not provided, all supported tokens will be available. [Learn more about token filtering →](./checking-available-tokens.md#token-filtering) |
 
@@ -287,6 +288,7 @@ const queryClient = new QueryClient()
       <BetSwirlSDKProvider
         initialChainId={base.id}
         supportedChains={chains.map(chain => chain.id)} // Same chains!
+        affiliates={["0xYourAffiliateAddress"]} // Optional: affiliate addresses
       >
         <TokenProvider>
           <BalanceProvider>
@@ -367,7 +369,10 @@ const DEGEN_TOKEN: TokenWithImage = {
 </BetSwirlSDKProvider>
 
 // ✅ Correct - include required initialChainId
-<BetSwirlSDKProvider initialChainId={base.id}>
+<BetSwirlSDKProvider
+  initialChainId={base.id}
+  supportedChains={[base.id]}
+>
   <App />
 </BetSwirlSDKProvider>
 ```

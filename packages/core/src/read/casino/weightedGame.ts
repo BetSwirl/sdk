@@ -1,6 +1,5 @@
 import { encodeFunctionData } from "viem";
 import { weightedGameAbi } from "../../abis";
-import placeHolderIcon from "../../assets/img/casino/slots/place_holder.png";
 import { chainByKey } from "../../data";
 import {
   CASINO_GAME_TYPE,
@@ -106,38 +105,42 @@ const volatilePlinkoConfiguration = {
   label: "Volatile",
   game: CASINO_GAME_TYPE.PLINKO,
 };
-
+const ZERO_SYMBOL_URL = "https://www.betswirl.com/img/sdk/casino/slot/null.png";
+const baseSafeSlotConfigurationSymbolUrl =
+  "https://www.betswirl.com/img/sdk/casino/slot/betswirl_safe/";
 const safeSlotConfiguration = {
   configId: 4,
   weights: [1850n, 1984n, 1844n, 1740n, 1416n, 599n, 417n, 125n, 25n],
   multipliers: [0n, 5208n, 8021n, 10417n, 15625n, 20833n, 31250n, 52083n, 104167n],
-  icons: [
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
+  symbolUrls: [
+    ZERO_SYMBOL_URL,
+    `${baseSafeSlotConfigurationSymbolUrl}1.png`,
+    `${baseSafeSlotConfigurationSymbolUrl}2.png`,
+    `${baseSafeSlotConfigurationSymbolUrl}3.png`,
+    `${baseSafeSlotConfigurationSymbolUrl}4.png`,
+    `${baseSafeSlotConfigurationSymbolUrl}5.png`,
+    `${baseSafeSlotConfigurationSymbolUrl}6.png`,
+    `${baseSafeSlotConfigurationSymbolUrl}7.png`,
+    `${baseSafeSlotConfigurationSymbolUrl}8.png`,
   ],
   label: "Safe",
   game: CASINO_GAME_TYPE.SLOT,
 };
+const baseVolatileSlotConfigurationSymbolUrl =
+  "https://www.betswirl.com/img/sdk/casino/slot/betswirl_volatile/";
 const volatileSlotConfiguration = {
   configId: 3,
   weights: [3180n, 3265n, 1714n, 826n, 600n, 310n, 102n, 3n],
   multipliers: [0n, 5209n, 10417n, 20833n, 31250n, 52083n, 104167n, 802083n],
-  icons: [
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
-    placeHolderIcon,
+  symbolUrls: [
+    ZERO_SYMBOL_URL,
+    `${baseVolatileSlotConfigurationSymbolUrl}1.png`,
+    `${baseVolatileSlotConfigurationSymbolUrl}2.png`,
+    `${baseVolatileSlotConfigurationSymbolUrl}3.png`,
+    `${baseVolatileSlotConfigurationSymbolUrl}4.png`,
+    `${baseVolatileSlotConfigurationSymbolUrl}5.png`,
+    `${baseVolatileSlotConfigurationSymbolUrl}6.png`,
+    `${baseVolatileSlotConfigurationSymbolUrl}7.png`,
   ],
   label: "Volatile",
   game: CASINO_GAME_TYPE.SLOT,
@@ -208,7 +211,7 @@ export const plinkoCachedConfigurations: WeightedGameCachedConfigurationsPerChai
     ],
   };
 
-export const slotCachedConfigurations: WeightedGameCachedConfigurationsPerChain<CachedWeightedGameConfigurationWithIcons> =
+export const slotCachedConfigurations: WeightedGameCachedConfigurationsPerChain<CachedWeightedGameConfigurationWithSymbols> =
   {
     [chainByKey.arbitrumSepolia.id]: [
       { ...safeSlotConfiguration, chainId: chainByKey.arbitrumSepolia.id },
@@ -354,7 +357,7 @@ export interface WeightedGameConfiguration {
   weights: BP_bigint[];
   multipliers: BP_bigint[];
   colors?: string[];
-  icons?: string[];
+  symbolUrls?: string[];
   label?: string;
 }
 
@@ -366,8 +369,9 @@ export interface CachedWeightedGameConfigurationWithColors extends CachedWeighte
   colors: string[];
 }
 
-export interface CachedWeightedGameConfigurationWithIcons extends CachedWeightedGameConfiguration {
-  icons: string[];
+export interface CachedWeightedGameConfigurationWithSymbols
+  extends CachedWeightedGameConfiguration {
+  symbolUrls: string[];
 }
 
 export async function getWeightedGameConfiguration(

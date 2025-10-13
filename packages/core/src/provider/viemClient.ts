@@ -11,6 +11,7 @@ import {
   type CasinoWaitRollOptions,
   type CoinTossRolledBet,
   casinoChainById,
+  claimFreebetCode,
   type DiceBetParams,
   type DiceFreebetParams,
   type DicePlacedBet,
@@ -44,6 +45,7 @@ import {
   type RouletteFreebetParams,
   type RoulettePlacedBet,
   type RouletteRolledBet,
+  signFreebetCode,
   type Token,
   WEIGHTED_CASINO_GAME_TYPES,
   type WeightedCasinoPlacedBet,
@@ -88,7 +90,8 @@ import {
   claimLeaderboardRewards,
   type LeaderboardClaimRewardsResult,
 } from "../actions/leaderboard/leaderboard";
-import type { CASINO_GAME_TYPE, ChainId, Leaderboard } from "../data";
+import type { CASINO_GAME_TYPE, CasinoChainId, ChainId, Leaderboard } from "../data";
+import { casinoChainIds } from "../data/casino";
 import { type SlotRolledBet, waitSlotRolledBet } from "../read/casino/slot";
 import {
   getWeightedGameConfiguration,
@@ -573,6 +576,29 @@ export class ViemBetSwirlClient extends BetSwirlClient {
       receiver,
       this.betSwirlDefaultOptions.pollingInterval,
       onClaimPending,
+    );
+  }
+
+  /* Freebet utilities */
+
+  async signAndClaimFreebetCode(code: string): Promise<{ success: boolean; error?: string }> {
+    const chainId = this.betSwirlWallet.getChainId();
+
+    if (!casinoChainIds.includes(chainId as CasinoChainId)) {
+      throw new Error(
+        `Chain ID ${chainId} is not supported for freebet code claiming. Supported chains: ${casinoChainIds.join(", ")}`,
+      );
+    }
+
+    // Sign the freebet code
+    const { signature, typedData } = await signFreebetCode(this.betSwirlWallet, code);
+
+    // Claim the freebet code
+    return claimFreebetCode(
+      signature,
+      typedData,
+      chainId as CasinoChainId,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
     );
   }
 

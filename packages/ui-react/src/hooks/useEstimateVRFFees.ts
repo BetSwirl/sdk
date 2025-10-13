@@ -7,7 +7,7 @@ import {
   Token,
   wrappedGasTokenById,
 } from "@betswirl/sdk-core"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useCall, usePublicClient } from "wagmi"
 import { CHAINLINK_VRF_FEES_BUFFER_PERCENT } from "../consts"
 import { useChain } from "../context/chainContext"
@@ -67,13 +67,19 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
     },
   })
 
+  const calculateVrfFeesWithBuffer = useCallback((rawVrfFees: string): bigint => {
+    const vrfFeesBigInt = BigInt(rawVrfFees)
+    const bufferMultiplier = BigInt(CHAINLINK_VRF_FEES_BUFFER_PERCENT + 100)
+    return (vrfFeesBigInt * bufferMultiplier) / 100n
+  }, [])
+
   useEffect(() => {
     // Trick to always have a value in vrfFees (because when useCall is refetched, it resets the data)
     if (vrfEstimateQuery.data?.data) {
       // Add a 26% buffer to the Chainlink VRF fees to cover gas price peaks
       setVrfFees(calculateVrfFeesWithBuffer(vrfEstimateQuery.data.data))
     }
-  }, [vrfEstimateQuery.data?.data])
+  }, [vrfEstimateQuery.data?.data, calculateVrfFeesWithBuffer])
 
   const formattedVrfFees = useMemo(() => {
     return Number.parseFloat(
@@ -112,12 +118,6 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
       console.log("getVrfFeesAndGasPrice failed: ", error)
       return { vrfFees, gasPrice: gasPriceData.optimalGasPrice }
     }
-  }
-
-  function calculateVrfFeesWithBuffer(rawVrfFees: string): bigint {
-    const vrfFeesBigInt = BigInt(rawVrfFees)
-    const bufferMultiplier = BigInt(CHAINLINK_VRF_FEES_BUFFER_PERCENT + 100)
-    return (vrfFeesBigInt * bufferMultiplier) / 100n
   }
 
   return {
