@@ -10,13 +10,29 @@ This guide walks you through creating a casino application using BetSwirl's Reac
 
 <Tabs items={['Fork Repository', 'From Scratch']}>
   <Tabs.Tab>
-**Coming soon**: Fork our ready-to-use React dApp template.
+#### Step 1: Fork Repository
 
-For now, follow the "From Scratch" tab to build your own.
+Fork this repository: https://github.com/BetSwirl/ui-react-demo
+
+Click the **"Fork"** button in the top right corner to create your own copy.
+
+#### Step 2: Clone and Run
+
+```shell
+# Clone your forked repository
+git clone https://github.com/YOUR_USERNAME/ui-react-demo.git
+cd ui-react-demo
+
+# Install dependencies and start dev server
+npm install
+npm run dev
+```
+
+Open in browser `http://localhost:5173`
   </Tabs.Tab>
 
   <Tabs.Tab>
-## Step 1: Create Project
+#### Step 1: Create Project
 
 ```shell
 # node --version
@@ -37,7 +53,7 @@ Stop the dev server (Ctrl+C) and navigate to the project directory:
 cd betswirl-ui-react-demo
 ```
 
-## Step 2: Install BetSwirl
+#### Step 2: Install BetSwirl
 
 ```shell
 npm i @betswirl/ui-react
@@ -45,7 +61,7 @@ npm i @betswirl/ui-react
 
 Package: [@betswirl/ui-react on npm](https://www.npmjs.com/package/@betswirl/ui-react)
 
-## Step 3: Setup Providers
+#### Step 3: Setup Providers
 
 Replace the entire content of `src/main.tsx` with:
 
@@ -150,7 +166,30 @@ createRoot(document.getElementById('root')!).render(
 - **Custom RPCs**: Fallback to default public RPCs if env variables not set
 - **Token filtering**: Limits available tokens to DEGEN, ETH, USDC, and BETS (you can change this list or remove to show all tokens - see [Configuration](#configuration) section below)
 
-## Step 4: Add Game Component
+#### Step 4: Add Affiliate Address
+
+Add your affiliate address to earn **30% of house edge revenue** from every bet placed through your app.
+
+Update `src/main.tsx` - add this line at the top with other environment variables:
+
+```tsx
+const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS
+```
+
+Then add `affiliate` prop to `BetSwirlSDKProvider`:
+
+```tsx
+<BetSwirlSDKProvider
+  initialChainId={base.id}
+  supportedChains={[base.id, polygon.id, arbitrum.id]}
+  affiliate={affiliateAddress}  // Add this line
+  // ... other props
+>
+```
+
+**Learn more:** [Affiliate Program](/protocol-hub/partners/affiliates) - track earnings, create freebets, manage leaderboards, and claim revenue.
+
+#### Step 5: Add Game Component
 
 Replace the entire content of `src/App.tsx` with:
 
@@ -179,7 +218,7 @@ export default App
 - **Custom colors**: Gold primary color (`rgb(225 159 31)`) and dark brown button text
 - **Background image**: Will add in next step
 
-## Step 5: Custom Branding
+#### Step 6: Custom Branding
 
 Customize theme, colors and backgrounds to match your brand.
 
@@ -253,17 +292,15 @@ body {
 }
 ```
 
-## Step 6: Run Your Casino
+#### Step 7: Run Your Casino
 
 ```shell
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Open in browser `http://localhost:5173`
 
-You should see a dice game with gold accents on a dark background - exactly like the [live demo](https://ui-react-demo.betswirl.com).
-
-## Step 7: Push to GitHub
+#### Step 8: Push to GitHub
 
 Before deploying, you need to push your code to GitHub.
 
@@ -299,6 +336,21 @@ Replace `YOUR_USERNAME` with your GitHub username.
 **4. Verify:** Refresh the GitHub page - you should see your code uploaded.
   </Tabs.Tab>
 </Tabs>
+
+## What You Have Now
+
+Your React casino application is ready with the following features already configured:
+
+- BetSwirl SDK integration with support for Base, Polygon, and Arbitrum
+- OnchainKit wallet connection
+- Fully functional Dice game component
+- Custom theming and branding with gold accents and dark theme
+- Background images for page and game
+- Freebet system for user promotions
+- Leaderboard support for competitive tournaments
+- Token selection with filtering for DEGEN, ETH, USDC, and BETS
+
+**Next steps:** Deploy to Vercel and add your affiliate address to start earning 30% commission from all bets.
 
 ## Deploy to Vercel
 
@@ -344,27 +396,7 @@ As an affiliate, you earn **30% of house edge revenue** from every bet placed th
 
 Click **"Save"** after adding variables.
 
-**2. Update `src/main.tsx` to read affiliate address:**
-
-Add this line at the top with other env variables:
-
-```tsx
-const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS
-```
-
-Then add `affiliate` prop to `BetSwirlSDKProvider`:
-
-```tsx
-<BetSwirlSDKProvider
-    initialChainId={base.id}
-    supportedChains={[base.id, polygon.id, arbitrum.id]}
-    affiliate={affiliateAddress}  // Add this line
-    bankrollToken={DEGEN_TOKEN}
-    filteredTokens={ALLOWED_TOKENS}
->
-```
-
-**3. Deploy changes:**
+**2. Deploy changes:**
 
 ```bash
 git add .
@@ -374,7 +406,7 @@ git push
 
 Vercel will automatically redeploy with your affiliate address and RPC endpoints.
 
-**4. Check your earnings:**
+**3. Check your earnings:**
 
 Once deployed, track your affiliate revenue:
 

@@ -6,23 +6,29 @@ import { Tabs } from 'nextra/components'
 
 <Tabs items={['Fork Repository', 'From Scratch']}>
   <Tabs.Tab>
-**Fork this repository:** https://github.com/BetSwirl/miniapp-ui-react-demo
+#### Step 1: Fork Repository
+
+Fork this repository: https://github.com/BetSwirl/miniapp-ui-react-demo
+
+Click the **"Fork"** button in the top right corner to create your own copy.
+
+#### Step 2: Clone and Run
 
 ```shell
-# Install dependencies
-npm install
+# Clone your forked repository
+git clone https://github.com/YOUR_USERNAME/miniapp-ui-react-demo.git
+cd miniapp-ui-react-demo
 
-# Start dev server
+# Install dependencies and start dev server
+npm install
 npm run dev
 ```
 
 Open in browser `http://localhost:3000/`
-
-**That's it!** The template includes all necessary setup: providers, game component, and styling.
   </Tabs.Tab>
 
   <Tabs.Tab>
-### Step 1: Create MiniKit project
+#### Step 1: Create MiniKit project
 
 ```shell
 # Create new MiniKit project
@@ -40,7 +46,7 @@ cd your-mini-project
 npm i @betswirl/ui-react
 ```
 
-### Step 2: Set up Providers
+#### Step 2: Set up Providers
 
 Replace the code in `app/providers.tsx` with:
 
@@ -120,7 +126,30 @@ export function Providers(props: { children: ReactNode }) {
 }
 ```
 
-### Step 3: Add Game Component
+#### Step 3: Add Affiliate Address
+
+Add your affiliate address to earn **30% of house edge revenue** from every bet placed through your app.
+
+Update `app/providers.tsx` - add this line at the top of the file with other constants:
+
+```tsx
+const affiliateAddress = process.env.NEXT_PUBLIC_AFFILIATE_ADDRESS
+```
+
+Then add `affiliate` prop to `BetSwirlSDKProvider`:
+
+```tsx
+<BetSwirlSDKProvider
+  initialChainId={base.id}
+  supportedChains={SUPPORTED_CHAIN_IDS}
+  affiliate={affiliateAddress}  // Add this line
+  // ... other props
+>
+```
+
+**Learn more:** [Affiliate Program](/protocol-hub/partners/affiliates) - track earnings, create freebets, manage leaderboards, and claim revenue.
+
+#### Step 4: Add Game Component
 
 Add the game component in `app/page.tsx`:
 
@@ -193,7 +222,7 @@ export default function App() {
 }
 ```
 
-### Step 4: Start dev server
+#### Step 5: Start dev server
 
 ```shell
 npm run dev
@@ -202,6 +231,20 @@ npm run dev
 Open in browser `http://localhost:3000/`
   </Tabs.Tab>
 </Tabs>
+
+## What You Have Now
+
+Your Farcaster Mini App is ready with the following features already configured:
+
+- BetSwirl SDK integration with support for Base, Polygon, Arbitrum, and Avalanche
+- MiniKit wallet connection and Farcaster Frame functionality
+- Fully functional Dice game component
+- Freebet system for user promotions
+- Leaderboard support for competitive tournaments
+- Token selection and balance management
+- Responsive UI optimized for mobile
+
+**Next steps:** Configure environment variables and deploy to Vercel to make your app accessible to Farcaster users.
 
 ## Environment Variables
 
