@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@betswirl/sdk-core": "0.1.26",
+    "@betswirl/wagmi-provider": "0.1.26",
+    "@betswirl/ui-react": "0.2.7"
+  },
+  "changesets": ["bright-kids-tell", "sad-horses-wonder"]
+}

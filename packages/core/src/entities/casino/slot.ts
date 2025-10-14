@@ -50,7 +50,8 @@ export interface Symbol {
   url: string;
 }
 
-const DEFAULT_SYMBOL_URL: string = "https://www.betswirl.com/img/sdk/casino/slot/default.png";
+export const DEFAULT_SYMBOL_URL: string =
+  "https://www.betswirl.com/img/sdk/casino/slot/default.png";
 
 export class Slot extends WeightedGame {
   // Slot utilities

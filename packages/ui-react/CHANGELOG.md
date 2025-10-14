@@ -1,5 +1,25 @@
 # @betswirl/ui-react
 
+## 0.2.8-beta.1
+
+### Patch Changes
+
+- Update getUniqueOutputs
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.27-beta.1
+  - @betswirl/sdk-core@0.1.27-beta.1
+
+## 0.2.8-beta.0
+
+### Patch Changes
+
+- Add slot casino game
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.27-beta.0
+  - @betswirl/sdk-core@0.1.27-beta.0
+
 ## 0.2.7
 
 ### Patch Changes

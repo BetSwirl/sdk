@@ -3,6 +3,7 @@ import type { EncodeAbiParametersReturnType } from "viem/_types/utils/abi/encode
 import {
   type BP,
   type CasinoChainId,
+  DEFAULT_SYMBOL_URL,
   generateRandomHexColor,
   getFormattedNetMultiplier,
   getNetMultiplier,
@@ -160,7 +161,7 @@ export class WeightedGame extends AbstractCasinoGame<
 
   /**
    * Computes and returns the list of unique outputs for a given weighted game configuration.
-   * It is particularly useful to display all the unique possible outputs above/below the wheel in the UI.
+   * It is particularly useful to display all the unique possible outputs above/below the wheel/slot in the UI.
    *
    * This function groups segments that have the same net multiplier (netMultiplier),
    * sums their weights, and returns for each unique multiplier:
@@ -168,6 +169,7 @@ export class WeightedGame extends AbstractCasinoGame<
    *   - the raw multiplier (before house edge)
    *   - the chance to win this multiplier (as a percentage)
    *   - the color associated with this segment (or a randomly generated color if not provided)
+   *   - the symbol associated with this segment (or the default symbol if not provided)
    *
    * @param weightedGameConfig The configuration (weights, multipliers, colors, etc.)
    * @param houseEdge The house edge to apply for net multiplier calculation
@@ -178,6 +180,7 @@ export class WeightedGame extends AbstractCasinoGame<
    *   - formattedNetMultiplier: the net multiplier formatted (rounded to 3 decimals)
    *   - chanceToWin: the probability of landing on this multiplier (in %)
    *   - color: the color associated with this segment
+   *   - symbol: the symbol associated with this segment (useful for games like slot)
    *
    * @example
    * const outputs = Wheel.getUniqueOutputs(config, 200);
@@ -196,8 +199,9 @@ export class WeightedGame extends AbstractCasinoGame<
     formattedNetMultiplier: number;
     chanceToWin: number;
     color: string;
+    symbol: string;
   }[] {
-    const uniqueMultipliers = new Map<number, { color: string; weight: bigint }>();
+    const uniqueMultipliers = new Map<number, { color: string; weight: bigint; symbol: string }>();
     const totalWeight = weightedGameConfig.weights.reduce((acc, curr) => acc + curr, 0n);
     weightedGameConfig.multipliers.forEach((_, index) => {
       const multiplier = WeightedGame.getMultiplier(weightedGameConfig, index);
@@ -205,6 +209,7 @@ export class WeightedGame extends AbstractCasinoGame<
         uniqueMultipliers.set(multiplier, {
           color: weightedGameConfig.colors?.[index] || generateRandomHexColor(),
           weight: weightedGameConfig.weights[index]!,
+          symbol: weightedGameConfig.symbolUrls?.[index] || DEFAULT_SYMBOL_URL,
         });
       } else {
         uniqueMultipliers.get(multiplier)!.weight =
@@ -222,6 +227,7 @@ export class WeightedGame extends AbstractCasinoGame<
         ),
         chanceToWin: Number(((Number(config.weight) / Number(totalWeight)) * 100).toFixed(2)),
         color: config.color,
+        symbol: config.symbol,
       }))
       .sort((a, b) => a.multiplier - b.multiplier);
   }

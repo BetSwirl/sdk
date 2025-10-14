@@ -1,5 +1,23 @@
 # @betswirl/wagmi-provider
 
+## 0.1.27-beta.1
+
+### Patch Changes
+
+- Update getUniqueOutputs
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.27-beta.1
+
+## 0.1.27-beta.0
+
+### Patch Changes
+
+- Add slot casino game
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.27-beta.0
+
 ## 0.1.26
 
 ### Patch Changes

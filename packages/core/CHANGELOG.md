@@ -1,5 +1,17 @@
 # @betswirl/sdk-core
 
+## 0.1.27-beta.1
+
+### Patch Changes
+
+- Update getUniqueOutputs
+
+## 0.1.27-beta.0
+
+### Patch Changes
+
+- Add slot casino game
+
 ## 0.1.26
 
 ### Patch Changes
