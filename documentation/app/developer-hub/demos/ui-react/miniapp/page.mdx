@@ -49,9 +49,59 @@ cd your-mini-project
 npm i @betswirl/ui-react
 ```
 
-#### Step 2: Set up Providers
+#### Step 2: Configure Manifest to Read Environment Variables
 
-Replace the code in `app/providers.tsx` with:
+The `create-onchain --mini` command creates `minikit.config.ts` with hardcoded values. Update it to read from environment variables:
+
+Open `minikit.config.ts` and replace the entire content with:
+
+```tsx
+const ROOT_URL =
+  process.env.NEXT_PUBLIC_URL ||
+  (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
+  "http://localhost:3000";
+
+/**
+ * MiniApp configuration object. Must follow the mini app manifest specification.
+ *
+ * @see {@link https://docs.base.org/mini-apps/features/manifest}
+ */
+export const minikitConfig = {
+  accountAssociation: {
+    header: process.env.FARCASTER_HEADER || "",
+    payload: process.env.FARCASTER_PAYLOAD || "",
+    signature: process.env.FARCASTER_SIGNATURE || "",
+  },
+  baseBuilder: {
+    allowedAddresses: [],
+  },
+  miniapp: {
+    version: "1",
+    name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME || "your-mini-project",
+    subtitle: process.env.NEXT_PUBLIC_APP_SUBTITLE || "",
+    description: process.env.NEXT_PUBLIC_APP_DESCRIPTION || "",
+    screenshotUrls: [],
+    iconUrl: process.env.NEXT_PUBLIC_APP_ICON || `${ROOT_URL}/icon.png`,
+    splashImageUrl: process.env.NEXT_PUBLIC_APP_SPLASH_IMAGE || `${ROOT_URL}/splash.png`,
+    splashBackgroundColor: process.env.NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR || "#000000",
+    homeUrl: ROOT_URL,
+    webhookUrl: `${ROOT_URL}/api/webhook`,
+    primaryCategory: (process.env.NEXT_PUBLIC_APP_PRIMARY_CATEGORY as any) || "utility",
+    tags: ["example"],
+    heroImageUrl: process.env.NEXT_PUBLIC_APP_HERO_IMAGE || `${ROOT_URL}/hero.png`,
+    tagline: process.env.NEXT_PUBLIC_APP_TAGLINE || "",
+    ogTitle: process.env.NEXT_PUBLIC_APP_OG_TITLE || "",
+    ogDescription: process.env.NEXT_PUBLIC_APP_OG_DESCRIPTION || "",
+    ogImageUrl: process.env.NEXT_PUBLIC_APP_OG_IMAGE || `${ROOT_URL}/hero.png`,
+  },
+} as const;
+```
+
+> **Note:** Default values (like `"your-mini-project"`, `"#000000"`) allow the app to work locally without environment variables. You'll add actual values when deploying to Vercel.
+
+#### Step 3: Set up Providers
+
+Replace the code in `app/rootProvider.tsx` with:
 
 > **Note:** For information about available networks and tokens, see [How to Check Available Tokens](../checking-available-tokens).
 
@@ -59,19 +109,19 @@ Replace the code in `app/providers.tsx` with:
 "use client";
 
 import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
-import { type AppConfig } from '@coinbase/onchainkit'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
 import { http } from "viem";
 import { WagmiProvider, createConfig } from "wagmi";
 import { base, arbitrum, avalanche, polygon } from "wagmi/chains";
-import { 
-  BetSwirlSDKProvider, 
-  TokenProvider, 
-  BalanceProvider, 
-  FreebetsProvider, 
-  LeaderboardProvider 
+import {
+  BetSwirlSDKProvider,
+  TokenProvider,
+  BalanceProvider,
+  FreebetsProvider,
+  LeaderboardProvider
 } from "@betswirl/ui-react";
+import "@coinbase/onchainkit/styles.css";
 
 const CHAINS = [base, polygon, arbitrum, avalanche] as const;
 const SUPPORTED_CHAIN_IDS = CHAINS.map((chain) => chain.id);
@@ -91,13 +141,7 @@ const config = createConfig({
   ssr: true,
 });
 
-const onChainKitConfig: AppConfig = {
-  wallet: {
-    display: "modal",
-  },
-};
-
-export function Providers(props: { children: ReactNode }) {
+export function RootProvider(props: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
@@ -105,9 +149,17 @@ export function Providers(props: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <MiniKitProvider
           chain={base}
-          config={onChainKitConfig}
+          config={{
+            appearance: {
+              mode: "auto",
+            },
+            wallet: {
+              display: "modal",
+              preference: "all",
+            },
+          }}
         >
-          <BetSwirlSDKProvider 
+          <BetSwirlSDKProvider
             initialChainId={base.id}
             supportedChains={SUPPORTED_CHAIN_IDS}
           >
@@ -128,9 +180,127 @@ export function Providers(props: { children: ReactNode }) {
 }
 ```
 
-#### Step 3: Add Game Component
+#### Step 4: Create UI Components
 
-Add the game component in `app/page.tsx`:
+Create the file `app/components/DemoComponents.tsx`:
+
+```bash
+mkdir app/components
+```
+
+Then create `app/components/DemoComponents.tsx` with this code:
+
+```tsx
+"use client";
+
+import { type ReactNode } from "react";
+
+type ButtonProps = {
+  children: ReactNode;
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  size?: "sm" | "md" | "lg";
+  className?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+  icon?: ReactNode;
+};
+
+export function Button({
+  children,
+  variant = "primary",
+  size = "md",
+  className = "",
+  onClick,
+  disabled = false,
+  type = "button",
+  icon,
+}: ButtonProps) {
+  const baseClasses =
+    "inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0052FF] disabled:opacity-50 disabled:pointer-events-none";
+
+  const variantClasses = {
+    primary:
+      "bg-[var(--app-accent)] hover:bg-[var(--app-accent-hover)] text-[var(--app-background)]",
+    secondary: "bg-[var(--app-gray)] hover:bg-[var(--app-gray-dark)] text-[var(--app-foreground)]",
+    outline:
+      "border border-[var(--app-accent)] hover:bg-[var(--app-accent-light)] text-[var(--app-accent)]",
+    ghost: "hover:bg-[var(--app-accent-light)] text-[var(--app-foreground-muted)]",
+  };
+
+  const sizeClasses = {
+    sm: "text-xs px-2.5 py-1.5 rounded-md",
+    md: "text-sm px-4 py-2 rounded-lg",
+    lg: "text-base px-6 py-3 rounded-lg",
+  };
+
+  return (
+    <button
+      type={type}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {icon && <span className="flex items-center mr-2">{icon}</span>}
+      {children}
+    </button>
+  );
+}
+
+type IconProps = {
+  name: "check" | "plus";
+  size?: "sm" | "md" | "lg";
+  className?: string;
+};
+
+export function Icon({ name, size = "md", className = "" }: IconProps) {
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-5 h-5",
+    lg: "w-6 h-6",
+  };
+
+  const icons = {
+    check: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <title>Check</title>
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    ),
+    plus: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <title>Plus</title>
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    ),
+  };
+
+  return <span className={`inline-block ${sizeClasses[size]} ${className}`}>{icons[name]}</span>;
+}
+```
+
+#### Step 5: Add Game Component
+
+Replace the code in `app/page.tsx` with:
 
 ```tsx
 "use client";
@@ -209,14 +379,14 @@ npm run dev
 
 Open `http://localhost:3000/` to connect wallet and place bets.
 
-#### Step 4: Add Affiliate Address
+#### Step 6: Add Affiliate Address
 
 Add your affiliate address to earn **30% of house edge revenue** from every bet placed through your app.
 
-Update `app/providers.tsx` - add this line at the top of the file with other constants:
+Update `app/rootProvider.tsx` - add this line at the top of the file with other constants:
 
 ```tsx
-const affiliateAddress = process.env.NEXT_PUBLIC_AFFILIATE_ADDRESS
+const affiliateAddress = process.env.NEXT_PUBLIC_AFFILIATE_ADDRESS as `0x${string}` | undefined
 ```
 
 Then add `affiliate` prop to `BetSwirlSDKProvider`:
@@ -232,19 +402,19 @@ Then add `affiliate` prop to `BetSwirlSDKProvider`:
 
 **Learn more:** [Affiliate Program](/protocol-hub/partners/affiliates) - track earnings, create freebets, manage leaderboards, and claim revenue.
 
-#### Step 5: Add Multiple Games
+#### Step 7: Add Multiple Games
 
 Add more games and navigation to let users switch between them.
 
 **1. Update your `app/page.tsx` - add imports at the top:**
 
-Add `useState` from React and import more games:
+Import more games:
 
 ```tsx
 "use client";
 
 import { useAddFrame, useMiniKit } from "@coinbase/onchainkit/minikit";
-import { useCallback, useEffect, useMemo, useState } from "react";  // Add useState
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Icon } from "./components/DemoComponents";
 import { DiceGame, CoinTossGame, RouletteGame } from "@betswirl/ui-react";  // Add more games
 import "@betswirl/ui-react/styles.css";
@@ -256,56 +426,57 @@ import "@betswirl/ui-react/styles.css";
 const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
 ```
 
-**3. Wrap your existing game with navigation:**
+**3. Update layout structure and add navigation:**
 
-Replace the `<main>` section with navigation and conditional game rendering:
+Update the entire `return` statement to separate header, navigation, and games:
 
 ```tsx
-<main className="flex flex-col justify-center">
-  {/* Navigation buttons */}
-  <nav style={{
-    display: 'flex',
-    gap: '8px',
-    justifyContent: 'center',
-    padding: '12px 0',
-    marginBottom: '12px',
-  }}>
-    {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
-      <button
-        key={g}
-        onClick={() => setGame(g)}
-        style={{
-          padding: '8px 16px',
-          background: game === g ? 'rgb(225 159 31)' : 'rgba(255, 255, 255, 0.05)',
-          color: game === g ? 'rgb(74 41 24)' : 'rgba(255, 255, 255, 0.6)',
-          border: game === g ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '6px',
-          fontSize: '14px',
-          fontWeight: '500',
-          transition: 'all 0.2s',
-          cursor: 'pointer',
-          outline: 'none',
-        }}
-      >
-        {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
-      </button>
-    ))}
-  </nav>
+return (
+  <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme">
+    <div className="w-full max-w-md mx-auto py-3">
+      <div className="px-4">
+        <header className="flex justify-between items-center mb-3 h-11">
+          <div>{saveFrameButton}</div>
+        </header>
+      </div>
 
-  {/* Games */}
-  {game === 'dice' && <DiceGame />}
-  {game === 'cointoss' && <CoinTossGame />}
-  {game === 'roulette' && <RouletteGame />}
-</main>
+      {/* Navigation buttons */}
+      <nav style={{
+        display: 'flex',
+        gap: '8px',
+        justifyContent: 'center',
+        padding: '12px 0',
+        marginBottom: '12px',
+      }}>
+        {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+          <button
+            key={g}
+            onClick={() => setGame(g)}
+            disabled={game === g}
+          >
+            {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+          </button>
+        ))}
+      </nav>
+
+      <div className="px-4">
+        <main className="flex justify-center">
+          {/* Games */}
+          {game === 'dice' && <DiceGame />}
+          {game === 'cointoss' && <CoinTossGame />}
+          {game === 'roulette' && <RouletteGame />}
+        </main>
+      </div>
+    </div>
+  </div>
+);
 ```
 
-#### Step 6: Leaderboard Integration
+#### Step 8: Leaderboard Integration (Optional)
 
-**Learn more:** [Leaderboard Integration](../configuration#leaderboard-integration)
+Enable the "Play Now" button in leaderboards to switch between games.
 
-**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in `app/providers.tsx`, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
-
-**1. Update `app/providers.tsx` - add import at the top:**
+**1. Update `app/rootProvider.tsx` - add import at the top:**
 
 ```tsx
 import { type PlayNowEvent } from '@betswirl/ui-react'
@@ -332,7 +503,9 @@ To:
 </LeaderboardProvider>
 ```
 
-#### Step 7: Custom Branding
+**Learn more:** [Leaderboard Integration](../configuration#leaderboard-integration)
+
+#### Step 9: Custom Branding
 
 **Learn more:** [Custom Branding](../configuration#custom-branding)
 
@@ -357,44 +530,14 @@ your-mini-project/
 
 **2. Customize game components** in your `app/page.tsx`:
 
-Add theme, colors, and background image to all game components:
+Add custom theme and background image props.
+
+**First, add `gameProps` object after the `addFrame` line:**
 
 ```tsx
-{game === 'dice' && (
-  <DiceGame
-    theme="dark"
-    customTheme={{
-      "--primary": "rgb(225 159 31)",
-      "--play-btn-font": "rgb(74 41 24)",
-    } as React.CSSProperties}
-    backgroundImage="/game-bg.png"
-  />
-)}
-{game === 'cointoss' && (
-  <CoinTossGame
-    theme="dark"
-    customTheme={{
-      "--primary": "rgb(225 159 31)",
-      "--play-btn-font": "rgb(74 41 24)",
-    } as React.CSSProperties}
-    backgroundImage="/game-bg.png"
-  />
-)}
-{game === 'roulette' && (
-  <RouletteGame
-    theme="dark"
-    customTheme={{
-      "--primary": "rgb(225 159 31)",
-      "--play-btn-font": "rgb(74 41 24)",
-    } as React.CSSProperties}
-    backgroundImage="/game-bg.png"
-  />
-)}
-```
+const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+const addFrame = useAddFrame();
 
-Or use a more compact version with shared props:
-
-```tsx
 const gameProps = {
   theme: "dark" as const,
   customTheme: {
@@ -403,13 +546,59 @@ const gameProps = {
   } as React.CSSProperties,
   backgroundImage: "/game-bg.png",
 }
+```
 
+**Then, update the games section to use these props:**
+
+Change from:
+```tsx
+{game === 'dice' && <DiceGame />}
+{game === 'cointoss' && <CoinTossGame />}
+{game === 'roulette' && <RouletteGame />}
+```
+
+To:
+```tsx
 {game === 'dice' && <DiceGame {...gameProps} />}
 {game === 'cointoss' && <CoinTossGame {...gameProps} />}
 {game === 'roulette' && <RouletteGame {...gameProps} />}
 ```
 
-**3. Add page background style (optional) - update `app/globals.css`:**
+**3. Style navigation buttons:**
+
+Replace the `<nav>` section in `app/page.tsx` with custom styled buttons:
+
+```tsx
+<nav style={{
+  display: 'flex',
+  gap: '8px',
+  justifyContent: 'center',
+  padding: '12px 0',
+  marginBottom: '12px',
+}}>
+  {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+    <button
+      key={g}
+      onClick={() => setGame(g)}
+      style={{
+        padding: '8px 16px',
+        background: game === g ? 'rgb(225 159 31)' : 'rgba(255, 255, 255, 0.05)',
+        color: game === g ? 'rgb(74 41 24)' : 'rgba(255, 255, 255, 0.6)',
+        border: game === g ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '6px',
+        fontSize: '14px',
+        fontWeight: '500',
+        transition: 'all 0.2s',
+        outline: 'none',
+      }}
+    >
+      {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+    </button>
+  ))}
+</nav>
+```
+
+**4. Add page background style (optional) - update `app/globals.css`:**
 
 Open `app/globals.css` and add these styles to the `body` section:
 
@@ -423,13 +612,48 @@ body {
 }
 ```
 
-#### Step 8: Start dev server
+#### Step 10: Start dev server
 
 ```shell
 npm run dev
 ```
 
 Open in browser `http://localhost:3000/`
+
+#### Step 11: Push to GitHub
+
+Before deploying, you need to push your code to GitHub.
+
+**1. Initialize Git and commit your code:**
+
+```bash
+git init
+git add .
+git commit -m "feat: initial farcaster mini app setup"
+```
+
+**2. Create a new repository on GitHub:**
+
+- Go to [github.com](https://github.com) and sign in
+- Click the **"+"** button in top right → **"New repository"**
+- Repository name: `my-farcaster-mini-app` (or any name you prefer)
+- Make it **Private**
+- **Do not** initialize with README, .gitignore, or license
+- Click **"Create repository"**
+
+**3. Connect your local project to GitHub:**
+
+GitHub will show you commands after creating the repository. Copy and run them:
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/my-farcaster-mini-app.git
+git branch -M main
+git push -u origin main
+```
+
+Replace `YOUR_USERNAME` with your GitHub username.
+
+**4. Verify:** Refresh the GitHub page - you should see your code uploaded.
   </Tabs.Tab>
 </Tabs>
 
@@ -446,13 +670,71 @@ Your Farcaster Mini App is ready with the following features already configured:
 - Token selection and balance management
 - Responsive UI optimized for mobile
 
-**Next steps:** Configure environment variables and deploy to Vercel to make your app accessible to Farcaster users.
+**Next steps:** Deploy to Vercel and configure environment variables to make your app accessible to Farcaster users.
+
+## Deploy to Vercel
+
+Now deploy your Farcaster Mini App to the web and get a public URL.
+
+Choose one of the following deployment methods: **Vercel CLI** or **Git Integration**.
+
+### Vercel CLI
+>⚠️ **Important:** If you set up the project from scratch, create a `.vercelignore` file in the root directory and add `.env` and any other files or folders you want to exclude from deployment.
+
+`.vercelignore`
+```bash
+.env
+# Exclude others
+...
+```
+
+```shell
+# Install Vercel CLI
+npm i -g vercel
+
+# Check for linting errors and fix if any
+npm run lint
+
+# Log in to Vercel
+vercel login
+
+# Run deployment from root project
+vercel --prod
+```
+
+![Vercel deploy](../screenshots/vercel-deploy.png)
+
+### Git Integration
+* Sign in to [vercel.com](https://vercel.com) with GitHub
+* Click "Add New..." → "Project"
+* Select your repository
+* Click "Import" → "Deploy"
+* Get public URL after ~2 minutes
+
+**Additional Information:**
+- [CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)
+
+## Check Domain Settings
+If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find and change your public domain in the project settings on Vercel.
+
+**Add a new domain:**
+[Add and configure domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain)
+
+**Find or edit an existing domain:**
+
+1. Go to your project on Vercel
+2. Open the **"Settings"** tab
+![Settings](../screenshots/settings.png)
+
+3. Go to the **"Domains"** section
+![Domains](../screenshots/domains.png)
+
+4. Click **"Edit"** next to your domain
+![Edit domain](../screenshots/edit-domain.png)
+
+5. Update your domain and click **"Save"**
 
 ## Environment Variables
-
-- **If you already have a project on Vercel**, you can add the environment variables in the project settings before deploying - see [Add environment variables on Vercel](#add-environment-variables-on-vercel).
-
-- **If you are creating a new project**, you can add the environment variables after the initial deployment. Go to the deployment step - [Deploy to Vercel](#deploy-to-vercel).
 
 > **Note:** The manifest file is publicly accessible at `/.well-known/farcaster.json`. Never store sensitive data in manifest environment variables.
 
@@ -686,3 +968,11 @@ For more information, see: [App Discovery & Search](https://miniapps.farcaster.x
 - [Farcaster Mini Apps Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
 - [Deploying to Vercel](https://vercel.com/docs/deployments)
 - [How to Check Available Tokens](../checking-available-tokens)
+
+---
+
+## Notes on Environment Variables Timing
+
+- **If you already have a project on Vercel**, you can add the environment variables in the project settings before deploying - see [Add environment variables on Vercel](#add-environment-variables-on-vercel).
+
+- **If you are creating a new project**, you can add the environment variables after the initial deployment. Go to the deployment step - [Deploy to Vercel](#deploy-to-vercel).

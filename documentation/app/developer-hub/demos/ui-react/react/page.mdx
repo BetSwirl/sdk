@@ -199,7 +199,7 @@ Add your affiliate address to earn **30% of house edge revenue** from every bet 
 Update `src/main.tsx` - add this line at the top with other environment variables:
 
 ```tsx
-const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS
+const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS as `0x${string}` | undefined
 ```
 
 Then add `affiliate` prop to `BetSwirlSDKProvider`:
@@ -276,13 +276,11 @@ function App() {
 export default App
 ```
 
-#### Step 7: Leaderboard Integration
+#### Step 7: Leaderboard Integration (Optional)
 
-**Learn more:** [Leaderboard Integration](../configuration#leaderboard-integration)
+Enable the "Play Now" button in leaderboards to switch between games.
 
-**Implementation:** Since `setGame` is inside App component and `LeaderboardProvider` is in `src/main.tsx`, you need to pass the callback down or lift state up. Here's a simple approach using `console.log` for now:
-
-In `src/main.tsx`:
+In `src/main.tsx`, add the import and callback:
 
 ```tsx
 import { type PlayNowEvent } from '@betswirl/ui-react'
@@ -294,6 +292,8 @@ import { type PlayNowEvent } from '@betswirl/ui-react'
   // TODO: Implement game switching based on your app architecture
 }}>
 ```
+
+**Learn more:** [Leaderboard Integration](../configuration#leaderboard-integration)
 
 #### Step 8: Custom Branding
 
@@ -318,53 +318,35 @@ betswirl-ui-react-demo/
 
 **2. Customize game components** in your `src/App.tsx`:
 
-Add theme, colors, and background image to all game components:
+Add custom theme and background image props.
+
+**First, add `gameProps` object after the `game` state:**
 
 ```tsx
-{game === 'dice' && (
-  <DiceGame
-    theme="dark"
-    customTheme={{
+function App() {
+  const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+
+  const gameProps = {
+    theme: "dark" as const,
+    customTheme: {
       "--primary": "rgb(225 159 31)",
       "--play-btn-font": "rgb(74 41 24)",
-    } as React.CSSProperties}
-    backgroundImage="/game-bg.png"
-  />
-)}
-{game === 'cointoss' && (
-  <CoinTossGame
-    theme="dark"
-    customTheme={{
-      "--primary": "rgb(225 159 31)",
-      "--play-btn-font": "rgb(74 41 24)",
-    } as React.CSSProperties}
-    backgroundImage="/game-bg.png"
-  />
-)}
-{game === 'roulette' && (
-  <RouletteGame
-    theme="dark"
-    customTheme={{
-      "--primary": "rgb(225 159 31)",
-      "--play-btn-font": "rgb(74 41 24)",
-    } as React.CSSProperties}
-    backgroundImage="/game-bg.png"
-  />
-)}
+    } as React.CSSProperties,
+    backgroundImage: "/game-bg.png",
+  }
 ```
 
-Or use a more compact version with shared props:
+**Then, update the games to use these props:**
 
+Change from:
 ```tsx
-const gameProps = {
-  theme: "dark" as const,
-  customTheme: {
-    "--primary": "rgb(225 159 31)",
-    "--play-btn-font": "rgb(74 41 24)",
-  } as React.CSSProperties,
-  backgroundImage: "/game-bg.png",
-}
+{game === 'dice' && <DiceGame />}
+{game === 'cointoss' && <CoinTossGame />}
+{game === 'roulette' && <RouletteGame />}
+```
 
+To:
+```tsx
 {game === 'dice' && <DiceGame {...gameProps} />}
 {game === 'cointoss' && <CoinTossGame {...gameProps} />}
 {game === 'roulette' && <RouletteGame {...gameProps} />}
