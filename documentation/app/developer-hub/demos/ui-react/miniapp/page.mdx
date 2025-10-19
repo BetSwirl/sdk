@@ -45,9 +45,17 @@ npx create-onchain --mini
 
 cd your-mini-project
 
+# Install dependencies
+npm install
+
 # Install BetSwirl UI
 npm i @betswirl/ui-react
+
+# Update OnchainKit to latest version
+npm install @coinbase/onchainkit@latest
 ```
+
+> **Note:** The `create-onchain` template may install an outdated OnchainKit version. Always update to the latest version to ensure all features work correctly.
 
 #### Step 2: Configure Manifest to Read Environment Variables
 
@@ -674,75 +682,44 @@ Your Farcaster Mini App is ready with the following features already configured:
 
 ## Deploy to Vercel
 
-Now deploy your Farcaster Mini App to the web and get a public URL.
+Deploy your Farcaster Mini App to Vercel using Git Integration:
 
-Choose one of the following deployment methods: **Vercel CLI** or **Git Integration**.
+1. Sign in to [vercel.com](https://vercel.com) with GitHub
+2. Click "Add New..." → "Project"
+3. Select your repository
+4. Click "Import" → "Deploy"
+5. Get public URL after ~2 minutes
 
-### Vercel CLI
->⚠️ **Important:** If you set up the project from scratch, create a `.vercelignore` file in the root directory and add `.env` and any other files or folders you want to exclude from deployment.
+## Check Domain Settings (Optional)
 
-`.vercelignore`
-```bash
-.env
-# Exclude others
-...
-```
+After deployment, Vercel automatically creates a public domain for your app (e.g., `your-project.vercel.app`). This domain works immediately and you can use it for the next steps.
 
-```shell
-# Install Vercel CLI
-npm i -g vercel
+If you want to customize your domain or add a custom domain, you can do so in the Vercel project settings:
 
-# Check for linting errors and fix if any
-npm run lint
-
-# Log in to Vercel
-vercel login
-
-# Run deployment from root project
-vercel --prod
-```
-
-![Vercel deploy](../screenshots/vercel-deploy.png)
-
-### Git Integration
-* Sign in to [vercel.com](https://vercel.com) with GitHub
-* Click "Add New..." → "Project"
-* Select your repository
-* Click "Import" → "Deploy"
-* Get public URL after ~2 minutes
-
-**Additional Information:**
-- [CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)
-
-## Check Domain Settings
-If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find and change your public domain in the project settings on Vercel.
-
-**Add a new domain:**
-[Add and configure domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain)
-
-**Find or edit an existing domain:**
+**View your automatically created domain:**
 
 1. Go to your project on Vercel
 2. Open the **"Settings"** tab
-![Settings](../screenshots/settings.png)
-
 3. Go to the **"Domains"** section
-![Domains](../screenshots/domains.png)
 
-4. Click **"Edit"** next to your domain
-![Edit domain](../screenshots/edit-domain.png)
-
-5. Update your domain and click **"Save"**
+**To add a custom domain:**
+- See [Add and configure domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain)
 
 ## Environment Variables
 
-> **Note:** The manifest file is publicly accessible at `/.well-known/farcaster.json`. Never store sensitive data in manifest environment variables.
+The Farcaster manifest is a JSON configuration file that describes your Mini App to Farcaster - its name, description, icons, and other metadata. This manifest is required for your app to work in Farcaster. Learn more: [Publishing Mini Apps](https://miniapps.farcaster.xyz/docs/guides/publishing).
 
-> **Note:** The manifest is generated during build through api route `app/.well-known/farcaster.json/route.ts`. This endpoint reads environment variables and returns JSON with your mini-app configuration for Farcaster.
+Your project generates this manifest through the API route `app/.well-known/farcaster.json/route.ts`. This file reads environment variables and creates the manifest JSON during build.
 
-You can find a template with the environment variables in `.env.example`, or in `.env` if you set up the project from scratch.
+After you add environment variables (next step) and redeploy, your manifest will be publicly accessible at `https://[your-app].vercel.app/.well-known/farcaster.json`.
 
-**Required variables for manifest:**
+You can find all environment variables in [`.env.example`](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/.env.example). If you need more details, see the official [Manifest properties documentation](https://miniapps.farcaster.xyz/docs/guides/publishing#define-your-application-configuration).
+
+The template includes default images in the `public/` folder. You can replace these with your own images, keeping the same file names and recommended dimensions:
+- [icon.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/icon.png) - App icon
+- [splash.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/splash.png) - Splash screen
+
+**Required variables (will be public in manifest):**
 ```bash
 # Full public URL with your domain.   
 NEXT_PUBLIC_URL="https://[your-app].vercel.app"
@@ -764,20 +741,24 @@ NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
 ```
 
 **Optional variables:**
-```bash
-# Shared variables
-NEXT_PUBLIC_ICON_URL=$NEXT_PUBLIC_URL/logo.png
 
-# Optional Frame metadata items
+These optional images are used in manifest metadata:
+- [hero.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/hero.png) - Hero image for app preview
+- [logo.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/logo.png) - Logo image
+
+```bash
+# Manifest metadata (will be public in manifest)
+NEXT_PUBLIC_ICON_URL=$NEXT_PUBLIC_URL/logo.png
 NEXT_PUBLIC_APP_TAGLINE=
-NEXT_PUBLIC_APP_OG_TITLE=farcaster-frame
+NEXT_PUBLIC_APP_OG_TITLE=
 NEXT_PUBLIC_APP_OG_DESCRIPTION=
 NEXT_PUBLIC_APP_OG_IMAGE=$NEXT_PUBLIC_URL/hero.png
 
-# Optional: BetSwirl affiliate address to earn 30% commission from bets
+# BetSwirl affiliate address (not in manifest)
+# Earn 30% commission from bets
 NEXT_PUBLIC_AFFILIATE_ADDRESS=
 
-# Optional: Custom RPC endpoints for better performance
+# Custom RPC endpoints (not in manifest)
 # Without these, the app uses free public RPCs which may be slower
 NEXT_PUBLIC_BASE_RPC_URL=
 NEXT_PUBLIC_POLYGON_RPC_URL=
@@ -785,72 +766,7 @@ NEXT_PUBLIC_ARBITRUM_RPC_URL=
 NEXT_PUBLIC_AVALANCHE_RPC_URL=
 ```
 
-Some variables use template images. Feel free to replace them, but keep the same format and dimensions.   
-
-**Additional Information:**    
-- All properties are configured through environment variables in the `app/.well-known/farcaster.json/route.ts` file.
-- [Complete list Manifest properties](https://miniapps.farcaster.xyz/docs/guides/publishing#define-your-application-configuration).   
-
-
-## Deploy to Vercel
-
-Choose one of the following deployment methods: **Vercel CLI** or **Git Integration**.
-
-### Vercel CLI
->⚠️ **Important:** If you set up the project from scratch, create a `.vercelignore` file in the root directory and add `.env` and any other files or folders you want to exclude from deployment.
-
-`.vercelignore`
-```bash
-.env
-# Exclude others
-...
-```
-
-```shell
-# Install Vercel CLI
-npm i -g vercel
-
-# Check for linting errors and fix if any
-npm run lint
-
-# Log in to Vercel
-vercel login
-
-# Run deployment from root project
-vercel --prod
-```
-
-![Vercel deploy](../screenshots/vercel-deploy.png)
-
-### Git Integration
-* Sign in to [vercel.com](https://vercel.com) with GitHub
-* Click "Add New..." → "Project"
-* Select your repository
-* Click "Import" → "Deploy"
-* Get public URL after ~2 minutes
-
-**Additional Information:**  
-- [CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)   
-
-## Check Domain Settings
-If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find and change your public domain in the project settings on Vercel. 
-
-**Add a new domain:**
-[Add and configure domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain)
-
-**Find or edit an existing domain:**   
-
-1. Go to your project on Vercel
-2. Open the **"Settings"** tab
-![Settings](../screenshots/settings.png)
-
-3. Go to the **"Domains"** section
-![Domains](../screenshots/domains.png)
-
-4. Click **"Edit"** next to your domain
-![Edit domain](../screenshots/edit-domain.png)
-
-5. Update your domain and click **"Save"**   
+Some variables use template images. Feel free to replace them, but keep the same format and dimensions.
 
 ## Add Environment Variables on Vercel
 
@@ -874,9 +790,9 @@ Replace `$NEXT_PUBLIC_URL` with your public URL in all variables where it is use
 
 7. Click **"Save"**
 
-## Redeploy  
-If you added environment variables for the manifest in Vercel project settings after deployment, you need to redeploy. 
- 
+## Redeploy
+If you added environment variables for the manifest in Vercel project settings after deployment, you need to redeploy.
+
 1. Go to your project dashboard in Vercel
 2. Click on the **"Deployments"** tab
 3. Select the latest deployment
@@ -891,7 +807,7 @@ To test your manifest:
 1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
 2. Paste your domain in the field without https and trailing slash (`[your-app].vercel.app`)
 
-After that, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
+After that, you'll be able to see your manifest and launch the mini-app in the Farcaster frame.
 
 If the manifest is valid, you'll see - `"Mini App configuration is valid."` in the **"Mini App Configuration"** section.
 
@@ -915,17 +831,20 @@ Once you have a valid manifest, you can share your Farcaster Mini App by posting
 Account association links the domain to your account. After this, users will be able to add your application to their Farcaster Mini App list. You can generate a signed account association object using the [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) in Warpcast. You need to have the Warpcast app installed on your phone.
 
 On the manifest page:
-1. Click the **"Generate account association"** button   
+1. Click the **"Generate account association"** button
 
-![Account Association](../screenshots/account-association.png)   
+![Account Association](../screenshots/account-association.png)
 
 2. On your phone, scan the provided QR code or go to the link - `https://farcaster.xyz/~/developers/register?domain=[your-app].vercel.app`.
 You should be redirected to the **"Account Association"** page in the Warpcast app for message signing.
-3. In the app, click the **"Sign as [your username]"** button.   
+3. In the app, click the **"Sign as [your username]"** button.
 If everything went well, you'll see the message - `"Signature sent, continue on desktop."`
 4. Return to the manifest page on your desktop. A modal window should open with the `accountAssociation` object containing your signed message. If it doesn't open, try refreshing the page and clicking **"Generate account association"** again.
-5. Copy your `accountAssociation` message and add these variables to your Vercel project:   
-[How add environment variables on Vercel](#add-environment-variables-on-vercel)    
+5. Copy your `accountAssociation` message and add these variables to your Vercel project.
+
+These values are generated after you sign the message in Warpcast app and are required for search indexing in Farcaster:
+
+[How add environment variables on Vercel](#add-environment-variables-on-vercel)
 ```bash
 FARCASTER_HEADER=
 FARCASTER_PAYLOAD=
@@ -933,8 +852,8 @@ FARCASTER_SIGNATURE=
 ```
 
 6. [Update your deployment](#redeploy)
-7. Return to the manifest page [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) and refresh it, or click the **"Refresh"** button.      
-In the **Account Association** section, you should see `"✓ Associated with your account"` next to your domain.   
+7. Return to the manifest page [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) and refresh it, or click the **"Refresh"** button.
+In the **Account Association** section, you should see `"✓ Associated with your account"` next to your domain.
 In the domain verification details table, the **Signature** field should show `"✓ Verified"`. This means the domain has been successfully associated with your account.
 
 **Additional Information:**
@@ -944,7 +863,7 @@ In the domain verification details table, the **Signature** field should show `"
 
 For your app to appear in Farcaster's Mini App search, **Account Association** must be configured. Without it, your app will not be included in search results.
 
-Set these variables if they are not already set:   
+Set these variables if they are not already set:
 
 1. [Add environment variables on Vercel](#add-environment-variables-on-vercel)
 ```bash
@@ -968,11 +887,3 @@ For more information, see: [App Discovery & Search](https://miniapps.farcaster.x
 - [Farcaster Mini Apps Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
 - [Deploying to Vercel](https://vercel.com/docs/deployments)
 - [How to Check Available Tokens](../checking-available-tokens)
-
----
-
-## Notes on Environment Variables Timing
-
-- **If you already have a project on Vercel**, you can add the environment variables in the project settings before deploying - see [Add environment variables on Vercel](#add-environment-variables-on-vercel).
-
-- **If you are creating a new project**, you can add the environment variables after the initial deployment. Go to the deployment step - [Deploy to Vercel](#deploy-to-vercel).
