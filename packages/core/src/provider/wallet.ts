@@ -4,6 +4,8 @@ import type {
   CallReturnType,
   Hash,
   TransactionReceipt,
+  TypedDataDomain,
+  TypedDataParameter,
   PublicClient as ViemPublicClient,
 } from "viem";
 import type { BetSwirlExtendedEventData, BetSwirlFunctionData } from "../interfaces";
@@ -42,4 +44,14 @@ export abstract class BetSwirlWallet {
   ): Promise<Hash>;
 
   abstract waitTransaction(txHash: Hash, pollingInterval?: number): Promise<TransactionReceipt>;
+
+  // TODO to improve to avoid unknown/any
+  abstract signTypedData<
+    TTypedData extends {
+      domain: TypedDataDomain;
+      types: Record<string, readonly TypedDataParameter[]>;
+      primaryType: string;
+      message: Record<string, unknown>;
+    },
+  >(typedData: TTypedData): Promise<Hash>;
 }

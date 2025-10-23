@@ -52,6 +52,8 @@ import type {
 import {
   BetSwirlClient,
   casinoChainById,
+  casinoChainIds,
+  claimFreebetCode,
   claimLeaderboardRewards,
   getBetRequirements,
   getCasinoGames,
@@ -75,6 +77,7 @@ import {
   placeWeightedGameFreebet,
   placeWheelBet,
   placeWheelFreebet,
+  signFreebetCode,
   WEIGHTED_CASINO_GAME_TYPES,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
@@ -564,6 +567,32 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     );
   }
 
+  /* Freebet code utilities */
+
+  async signAndClaimFreebetCode(
+    code: string,
+    chainId?: CasinoChainId,
+  ): Promise<{ success: boolean; error?: string }> {
+    const effectiveChainId = await this._switchChain(chainId);
+
+    if (!effectiveChainId || !casinoChainIds.includes(effectiveChainId as CasinoChainId)) {
+      throw new Error(
+        `Chain ID ${effectiveChainId} is not supported for freebet code claiming. Supported chains: ${casinoChainIds.join(", ")}`,
+      );
+    }
+
+    // Sign the freebet code
+    const { signature, typedData } = await signFreebetCode(this.betSwirlWallet, code);
+
+    // Claim the freebet code
+    return claimFreebetCode(
+      signature,
+      typedData,
+      effectiveChainId as CasinoChainId,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
+  }
+
   /* Private */
   async _switchChain(chainId?: ChainId) {
     const effectiveChainId = chainId || this.betSwirlDefaultOptions.chainId;
@@ -573,6 +602,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
         await switchChain(this.wagmiConfig, { chainId: effectiveChainId });
       }
     }
+    return effectiveChainId;
   }
 
   static init(wagmiConfig: WagmiConfig, options?: BetSwirlClientOptions): WagmiBetSwirlClient {

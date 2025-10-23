@@ -21,7 +21,7 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
   refetch: () => void
 } {
   const { appChainId } = useChain()
-  const { affiliate, testMode } = useBettingConfig()
+  const { getAffiliateForChain, testMode } = useBettingConfig()
   const { address } = useAccount()
   const publicClient = usePublicClient({ chainId: appChainId })
 
@@ -41,7 +41,7 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
         publicClient,
         chainId: appChainId,
         address,
-        affiliate,
+        affiliate: getAffiliateForChain(appChainId),
         testMode,
       })
 

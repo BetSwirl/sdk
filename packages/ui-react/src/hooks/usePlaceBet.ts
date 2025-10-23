@@ -95,13 +95,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
     hash: wagerWriteHook.data,
     chainId: appChainId,
   })
-  const {
-    vrfFees,
-    wagmiHook: estimateVrfFeesWagmiHook,
-    formattedVrfFees,
-    gasPrice,
-    getVrfFeesAndGasPrice,
-  } = useEstimateVRFFees({
+  const { vrfFees, formattedVrfFees, gasPrice, getVrfFeesAndGasPrice } = useEstimateVRFFees({
     game,
     token,
     betCount: 1, // TODO make this number dynamic when multi betting is integrated
@@ -241,13 +235,10 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
       appChainId,
       connectedAddress,
       wagerWriteHook.writeContract,
-      estimateVrfFeesWagmiHook.refetch,
-      formattedVrfFees,
-      vrfFees,
-      gasPrice,
       token,
       gameDefinition,
       strategy,
+      getVrfFeesAndGasPrice,
     ],
   )
 
@@ -264,7 +255,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
   }, [wagerWaitingHook.error])
 
   useEffect(() => {
-    if (wagerWaitingHook.isSuccess && game) {
+    if (wagerWaitingHook.isSuccess && betStatus !== "success" && game) {
       setIsRolling(true)
       const handleBetResult = async () => {
         const betId = await _extractBetIdFromReceipt(
@@ -326,6 +317,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
     refetchBalance,
     currentBetAmount,
     token,
+    betStatus,
   ])
 
   return {
