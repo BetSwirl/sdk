@@ -156,16 +156,8 @@ export function RootProvider(props: { children: ReactNode }) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <MiniKitProvider
-          chain={base}
-          config={{
-            appearance: {
-              mode: "auto",
-            },
-            wallet: {
-              display: "modal",
-              preference: "all",
-            },
-          }}
+          enabled={true}
+          autoConnect={true}
         >
           <BetSwirlSDKProvider
             initialChainId={base.id}
@@ -320,16 +312,16 @@ import { DiceGame } from "@betswirl/ui-react";
 import "@betswirl/ui-react/styles.css";
 
 export default function App() {
-  const { setFrameReady, isFrameReady, context } = useMiniKit();
+  const { setMiniAppReady, isMiniAppReady, context } = useMiniKit();
   const [frameAdded, setFrameAdded] = useState(false);
 
   const addFrame = useAddFrame();
 
   useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady();
+    if (!isMiniAppReady) {
+      setMiniAppReady();
     }
-  }, [setFrameReady, isFrameReady]);
+  }, [setMiniAppReady, isMiniAppReady]);
 
   const handleAddFrame = useCallback(async () => {
     const frameAdded = await addFrame();
