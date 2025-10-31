@@ -710,52 +710,65 @@ You can find all environment variables in [`.env.example`](https://github.com/Be
 The template includes default images in the `public/` folder. You can replace these with your own images, keeping the same file names and recommended dimensions:
 - [icon.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/icon.png) - App icon
 - [splash.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/splash.png) - Splash screen
+- [hero.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/hero.png) - Hero image for app preview
+- [logo.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/logo.png) - Logo image
 
-**Required variables (will be public in manifest):**
+> **Quick start:** Download [`.env.example`](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/.env.example), copy it to `.env`, replace only `NEXT_PUBLIC_URL` with your Vercel domain, and upload the entire file to Vercel. All other variables have working defaults or can be filled later.
+
+**Environment Variables:**
 ```bash
-# Full public URL with your domain.   
+# ════════════════════════════════════════════════════════════════════
+# > Minimum required for first deploy (manifest)
+# ════════════════════════════════════════════════════════════════════
+# Replace with your Vercel domain - this is the ONLY variable you must change
 NEXT_PUBLIC_URL="https://[your-app].vercel.app"
+
+# These have working defaults, but you can customize:
 NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME="YOUR_PROJECT_NAME"
 NEXT_PUBLIC_APP_ICON=$NEXT_PUBLIC_URL/icon.png
 NEXT_PUBLIC_APP_HERO_IMAGE=$NEXT_PUBLIC_URL/hero.png # For app preview
 
 # ════════════════════════════════════════════════════════════════════
-# > Can be set after app registration (see "Account Association"):
+# > Recommended for search indexing (manifest, can add now or later)
 # ════════════════════════════════════════════════════════════════════
-# Required for search indexing
 NEXT_PUBLIC_APP_DESCRIPTION="Your app description"
-
-# Recommended to set. May be required for search indexing in Warpcast
 NEXT_PUBLIC_APP_SUBTITLE="Your App Subtitle"
 NEXT_PUBLIC_APP_SPLASH_IMAGE=$NEXT_PUBLIC_URL/splash.png
 NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR="#your-color-in-hex"
 NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
-```
 
-**Optional variables:**
-
-These optional images are used in manifest metadata:
-- [hero.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/hero.png) - Hero image for app preview
-- [logo.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/logo.png) - Logo image
-
-```bash
-# Manifest metadata (will be public in manifest)
+# ════════════════════════════════════════════════════════════════════
+# > Optional metadata (manifest, can add now or later)
+# ════════════════════════════════════════════════════════════════════
 NEXT_PUBLIC_ICON_URL=$NEXT_PUBLIC_URL/logo.png
 NEXT_PUBLIC_APP_TAGLINE=
 NEXT_PUBLIC_APP_OG_TITLE=
 NEXT_PUBLIC_APP_OG_DESCRIPTION=
 NEXT_PUBLIC_APP_OG_IMAGE=$NEXT_PUBLIC_URL/hero.png
 
-# BetSwirl affiliate address (not in manifest)
+# ════════════════════════════════════════════════════════════════════
+# > BetSwirl SDK settings (not in manifest, can add now or later)
+# ════════════════════════════════════════════════════════════════════
 # Earn 30% commission from bets
 NEXT_PUBLIC_AFFILIATE_ADDRESS=
 
-# Custom RPC endpoints (not in manifest)
+# ════════════════════════════════════════════════════════════════════
+# > Custom RPC endpoints (not in manifest, can add now or later)
+# ════════════════════════════════════════════════════════════════════
 # Without these, the app uses free public RPCs which may be slower
 NEXT_PUBLIC_BASE_RPC_URL=
 NEXT_PUBLIC_POLYGON_RPC_URL=
 NEXT_PUBLIC_ARBITRUM_RPC_URL=
 NEXT_PUBLIC_AVALANCHE_RPC_URL=
+
+# ════════════════════════════════════════════════════════════════════
+# > Account Association - LEAVE EMPTY FOR NOW
+# ════════════════════════════════════════════════════════════════════
+# Not in manifest - used for account association verification
+# You'll get these values after completing the Account Association step below
+FARCASTER_HEADER=
+FARCASTER_PAYLOAD=
+FARCASTER_SIGNATURE=
 ```
 
 Some variables use template images. Feel free to replace them, but keep the same format and dimensions.
