@@ -25,8 +25,17 @@ Click the **"Fork"** button in the top right corner to create your own copy.
 git clone https://github.com/YOUR_USERNAME/ui-react-demo.git
 cd ui-react-demo
 
-# Install dependencies and start dev server
+# Install dependencies
 npm install
+
+# Create .env file from template
+cp .env.example .env
+```
+
+You can fill `.env` now or leave it empty - how to configure affiliate address and custom RPC is explained below in [Add Affiliate & Custom RPC](#add-affiliate--custom-rpc) section.
+
+```shell
+# Start dev server
 npm run dev
 ```
 
@@ -183,6 +192,14 @@ function App() {
 
 export default App
 ```
+
+Download [`.env.example`](https://github.com/BetSwirl/ui-react-demo/blob/main/.env.example) from the repository, save it to your project root, and create `.env`:
+
+```shell
+cp .env.example .env
+```
+
+You can fill `.env` now or leave it empty - how to configure affiliate address and custom RPC is explained below in [Add Affiliate & Custom RPC](#add-affiliate--custom-rpc) section.
 
 You can test it now:
 
@@ -592,9 +609,11 @@ The base setup above gives you a fully functional casino. Below are optional fea
 
 ---
 
-## Configuration Reference
+## Documentation
 
-For detailed information about all `BetSwirlSDKProvider` parameters, see the [Configuration Reference](../configuration).
+- [How to Add Multiple Games](#step-6-add-multiple-games) - Switch between Dice, CoinToss, Roulette and more
+- [How to Check Available Tokens](../checking-available-tokens)
+- [Configuration Reference](../configuration) - All BetSwirlSDKProvider parameters, Leaderboard Integration, Custom Branding
 
 ---
 

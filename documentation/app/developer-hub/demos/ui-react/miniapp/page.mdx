@@ -713,7 +713,7 @@ The template includes default images in the `public/` folder. You can replace th
 - [hero.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/hero.png) - Hero image for app preview
 - [logo.png](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/public/logo.png) - Logo image
 
-> **Quick start:** Download [`.env.example`](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/.env.example), copy it to `.env`, replace only `NEXT_PUBLIC_URL` with your Vercel domain, and upload the entire file to Vercel. All other variables have working defaults or can be filled later.
+> **Quick start:** Download [`.env.example`](https://github.com/BetSwirl/miniapp-ui-react-demo/blob/main/.env.example), copy it to `.env`, replace `NEXT_PUBLIC_URL` with your Vercel domain, then replace all occurrences of `$NEXT_PUBLIC_URL` with your full domain URL (e.g., `https://your-app.vercel.app`), and upload the entire file to Vercel. All other variables have working defaults or can be filled later.
 
 **Environment Variables:**
 ```bash
@@ -770,8 +770,6 @@ FARCASTER_HEADER=
 FARCASTER_PAYLOAD=
 FARCASTER_SIGNATURE=
 ```
-
-Some variables use template images. Feel free to replace them, but keep the same format and dimensions.
 
 ## Add Environment Variables on Vercel
 
@@ -877,7 +875,7 @@ NEXT_PUBLIC_APP_DESCRIPTION="Your app description"
 
 # Recommended to set. May be required for search indexing in Warpcast
 NEXT_PUBLIC_APP_SUBTITLE="Your App Subtitle"
-NEXT_PUBLIC_APP_SPLASH_IMAGE=$NEXT_PUBLIC_URL/splash.png
+NEXT_PUBLIC_APP_SPLASH_IMAGE=https://[your-app].vercel.app/splash.png
 NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR="#your-color-in-hex"
 NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
 ```
@@ -887,8 +885,8 @@ For more information, see: [App Discovery & Search](https://miniapps.farcaster.x
 
 ## Documentation
 
+- [How to Add Multiple Games](#step-7-add-multiple-games) - Switch between Dice, CoinToss, Roulette and more
+- [How to Check Available Tokens](../checking-available-tokens)
 - [Configuration Reference](../configuration) - All BetSwirlSDKProvider parameters, Leaderboard Integration, Custom Branding
 - [MiniKit Documentation](https://docs.base.org/wallet-app/build-with-minikit/quickstart)
 - [Farcaster Mini Apps Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
-- [Deploying to Vercel](https://vercel.com/docs/deployments)
-- [How to Check Available Tokens](../checking-available-tokens)
