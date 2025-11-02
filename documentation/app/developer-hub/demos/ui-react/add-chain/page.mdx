@@ -1,0 +1,109 @@
+# How to Add a Chain
+
+import { Tabs } from 'nextra/components'
+
+This guide shows you how to add or change blockchain networks in your BetSwirl casino app.
+
+## Supported Networks
+
+BetSwirl SDK supports multiple EVM-compatible networks. To see the current list of supported networks, check the [`casinoChainById`](https://github.com/BetSwirl/sdk/blob/main/packages/core/src/data/casino.ts#L588-L598) object in the SDK source code.
+
+## How to Add a Chain
+
+<Tabs items={['React', 'Mini App']}>
+<Tabs.Tab>
+
+**1. Import the chain from wagmi**
+
+In `src/main.tsx`:
+
+```tsx
+import { base, polygon, arbitrum, bsc } from 'wagmi/chains'
+```
+
+**2. Add the chain to your config**
+
+```tsx
+// Add RPC env variable at the top
+const baseRpc = import.meta.env.VITE_BASE_RPC_URL
+const polygonRpc = import.meta.env.VITE_POLYGON_RPC_URL
+const arbitrumRpc = import.meta.env.VITE_ARBITRUM_RPC_URL
+const bscRpc = import.meta.env.VITE_BSC_RPC_URL
+
+const config = createConfig({
+  chains: [base, polygon, arbitrum, bsc],
+  transports: {
+    [base.id]: baseRpc ? http(baseRpc) : http(),
+    [polygon.id]: polygonRpc ? http(polygonRpc) : http(),
+    [arbitrum.id]: arbitrumRpc ? http(arbitrumRpc) : http(),
+    [bsc.id]: bscRpc ? http(bscRpc) : http(),
+  },
+})
+```
+
+**3. Update BetSwirlSDKProvider**
+
+```tsx
+<BetSwirlSDKProvider
+  initialChainId={base.id}
+  supportedChains={[base.id, polygon.id, arbitrum.id, bsc.id]}
+  // ...
+>
+```
+
+**4. (Optional) Add custom RPC URL to `.env`**
+
+```bash
+VITE_BSC_RPC_URL=https://bsc-mainnet.g.alchemy.com/v2/your-api-key
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+**1. Import the chain from wagmi**
+
+In `app/rootProvider.tsx`:
+
+```tsx
+import { base, polygon, arbitrum, avalanche, bsc } from "wagmi/chains"
+```
+
+**2. Add the chain to your config**
+
+```tsx
+const CHAINS = [base, polygon, arbitrum, avalanche, bsc] as const
+const SUPPORTED_CHAIN_IDS = CHAINS.map((chain) => chain.id)
+
+const TRANSPORTS = {
+  [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || undefined),
+  [polygon.id]: http(process.env.NEXT_PUBLIC_POLYGON_RPC_URL || undefined),
+  [arbitrum.id]: http(process.env.NEXT_PUBLIC_ARBITRUM_RPC_URL || undefined),
+  [avalanche.id]: http(process.env.NEXT_PUBLIC_AVALANCHE_RPC_URL || undefined),
+  [bsc.id]: http(process.env.NEXT_PUBLIC_BSC_RPC_URL || undefined),
+}
+
+const config = createConfig({
+  chains: CHAINS,
+  transports: TRANSPORTS,
+  ssr: true,
+})
+```
+
+**3. Update BetSwirlSDKProvider**
+
+```tsx
+<BetSwirlSDKProvider
+  initialChainId={base.id}
+  supportedChains={SUPPORTED_CHAIN_IDS}
+  // ...
+>
+```
+
+**4. (Optional) Add custom RPC URL to `.env`**
+
+```bash
+NEXT_PUBLIC_BSC_RPC_URL=https://bsc-mainnet.g.alchemy.com/v2/your-api-key
+```
+
+</Tabs.Tab>
+</Tabs>

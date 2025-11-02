@@ -186,17 +186,23 @@ const meta = {
           "ui-react": {
             title: "UI React",
             items: {
-              miniapp: {
-                title: "Farcaster Mini App",
-              },
               react: {
-                title: "React dApp",
+                title: "🚀 React dApp",
+              },
+              miniapp: {
+                title: "🚀 Farcaster Mini App",
+              },
+              "add-chain": {
+                title: "Add a Chain",
               },
               "checking-available-tokens": {
-                title: "Checking Available Tokens",
+                title: "Check Available Tokens",
+              },
+              configuration: {
+                title: "Configuration",
               },
               "hosted-manifest-guide": {
-                title: "Farcaster Hosted Manifest Guide",
+                title: "Hosted Manifest Guide",
               },
             },
           },
