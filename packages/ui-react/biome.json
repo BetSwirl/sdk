@@ -19,14 +19,14 @@
       "*.json",
       "*.js",
       "*.ts",
-      "!.cache-synpress/**",
-      "!node_modules/**",
-      "!dist/**",
-      "!test-results/**",
-      "!playwright-report/**",
-      "!coverage/**",
-      "!.turbo/**",
-      "!build/**"
+      "!.cache-synpress",
+      "!node_modules",
+      "!dist",
+      "!test-results",
+      "!playwright-report",
+      "!coverage",
+      "!.turbo",
+      "!build"
     ],
     "ignoreUnknown": true
   },

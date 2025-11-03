@@ -6,4 +6,4 @@ packages:
 
 
 catalog:
-    viem: ^2.22.23
+    viem: ^2.38.6
