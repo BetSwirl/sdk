@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.1.27
+
+### Patch Changes
+
+- Update wagmi/viem/graphql dependencies
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.27
+
 ## 0.1.26
 
 ### Patch Changes

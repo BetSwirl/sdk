@@ -1,4 +1,4 @@
-import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
+import type { ApolloCache, ApolloClient } from "@apollo/client";
 import type { Address, Hash, Hex, TransactionReceipt } from "viem";
 import type {
   PlinkoBetParams,
@@ -101,8 +101,8 @@ export interface BetSwirlClientOptions {
   formatType?: FORMAT_TYPE;
   subgraphClient?: {
     graphqlKey?: string;
-    cache?: ApolloCache<any>;
-    defaultOptions?: DefaultOptions;
+    cache?: ApolloCache;
+    defaultOptions?: ApolloClient.DefaultOptions;
   };
   api?: {
     testMode?: boolean;

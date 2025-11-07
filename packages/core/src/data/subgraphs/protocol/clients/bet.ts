@@ -1,4 +1,4 @@
-import { ApolloClient } from "@apollo/client/core/index.js";
+import { ApolloClient, HttpLink } from "@apollo/client";
 import { type Address, getAddress, type Hash, zeroAddress } from "viem";
 import type { NORMAL_CASINO_GAME_TYPE, WeightedGameConfiguration } from "../../../..";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../../../../constants";
@@ -152,7 +152,7 @@ export async function fetchBets(
   },
 ): Promise<{ bets: CasinoBet[]; error: SubgraphError | undefined }> {
   const apolloClient = new ApolloClient({
-    uri: getGraphqlEndpoint(client),
+    link: new HttpLink({ uri: getGraphqlEndpoint(client) }),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
     defaultOptions: client.defaultOptions ?? defaultSubgraphCasinoClient.defaultOptions,
   });
@@ -202,7 +202,7 @@ export async function fetchBet(
   client: SubgraphCasinoClient,
 ): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
   const apolloClient = new ApolloClient({
-    uri: getGraphqlEndpoint(client),
+    link: new HttpLink({ uri: getGraphqlEndpoint(client) }),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
   });
 
@@ -214,7 +214,7 @@ export async function fetchBet(
   });
 
   return {
-    bet: data.bet
+    bet: data?.bet
       ? formatCasinoBet(
           data.bet,
           client.chainId,
@@ -232,7 +232,7 @@ export async function fetchBetByHash(
   client: SubgraphCasinoClient,
 ): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
   const apolloClient = new ApolloClient({
-    uri: getGraphqlEndpoint(client),
+    link: new HttpLink({ uri: getGraphqlEndpoint(client) }),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
     defaultOptions: client.defaultOptions ?? defaultSubgraphCasinoClient.defaultOptions,
   });
@@ -249,7 +249,7 @@ export async function fetchBetByHash(
     variables,
   });
   return {
-    bet: data.bets[0]
+    bet: data?.bets[0]
       ? formatCasinoBet(
           data.bets[0],
           client.chainId,

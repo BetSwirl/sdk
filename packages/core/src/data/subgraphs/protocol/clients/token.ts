@@ -1,4 +1,4 @@
-import { ApolloClient } from "@apollo/client/core/index.js";
+import { ApolloClient, HttpLink } from "@apollo/client";
 import { type Address } from "viem";
 import { DEFAULT_ITEMS_PER_PAGE, SubgraphError } from "../../../..";
 import { DEFAULT_PAGE } from "../../../../constants";
@@ -68,7 +68,7 @@ export async function fetchTokens(
   },
 ): Promise<{ tokens: SubgraphToken[]; error: SubgraphError | undefined }> {
   const apolloClient = new ApolloClient({
-    uri: getGraphqlEndpoint(client),
+    link: new HttpLink({ uri: getGraphqlEndpoint(client) }),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
     defaultOptions: client.defaultOptions ?? defaultSubgraphCasinoClient.defaultOptions,
   });
@@ -106,7 +106,7 @@ export async function fetchToken(
   client: SubgraphCasinoClient,
 ): Promise<{ token: SubgraphToken | undefined; error: SubgraphError | undefined }> {
   const apolloClient = new ApolloClient({
-    uri: getGraphqlEndpoint(client),
+    link: new HttpLink({ uri: getGraphqlEndpoint(client) }),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
   });
 
@@ -118,7 +118,7 @@ export async function fetchToken(
   });
 
   return {
-    token: data.token
+    token: data?.token
       ? formatToken(
           data.token,
           client.chainId,

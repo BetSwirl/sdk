@@ -1,5 +1,15 @@
 # @betswirl/ui-react
 
+## 0.2.8
+
+### Patch Changes
+
+- Update wagmi/viem/graphql dependencies
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.27
+  - @betswirl/sdk-core@0.1.27
+
 ## 0.2.7
 
 ### Patch Changes

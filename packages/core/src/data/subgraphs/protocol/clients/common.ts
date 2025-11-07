@@ -1,9 +1,4 @@
-import {
-  type ApolloCache,
-  type DefaultOptions,
-  type FetchPolicy,
-  InMemoryCache,
-} from "@apollo/client/core/index.js";
+import { type ApolloCache, ApolloClient, type FetchPolicy, InMemoryCache } from "@apollo/client";
 import { FORMAT_TYPE } from "../../../../utils/format";
 import { replaceGraphQlKey } from "../../../../utils/subgraphs";
 import { type CasinoChainId, casinoChainById } from "../../../casino";
@@ -11,8 +6,8 @@ import { type CasinoChainId, casinoChainById } from "../../../casino";
 export interface SubgraphCasinoClient {
   chainId: CasinoChainId;
   theGraphKey?: string;
-  cache?: ApolloCache<any>;
-  defaultOptions?: DefaultOptions;
+  cache?: ApolloCache;
+  defaultOptions?: ApolloClient.DefaultOptions;
   formatType?: FORMAT_TYPE;
 }
 

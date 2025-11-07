@@ -1,4 +1,4 @@
-import type { ApolloError } from "@apollo/client/core/index.js";
+import type { ErrorLike } from "@apollo/client";
 import { BetSwirlError } from "./betSwirlError";
 
 export class ChainError extends BetSwirlError {
@@ -23,11 +23,11 @@ export class ConfigurationError extends BetSwirlError {
 }
 
 export class SubgraphError extends BetSwirlError {
-  public apolloError: ApolloError;
+  public apolloError: ErrorLike;
   constructor(
     message: string,
     code: string,
-    apolloError: ApolloError,
+    apolloError: ErrorLike,
     context?: Record<string, any>,
   ) {
     const errorContext = context ? { ...context, apolloError } : { apolloError };

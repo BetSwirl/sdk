@@ -7,3 +7,6 @@ packages:
 
 catalog:
     viem: ^2.38.6
+    graphql: ^16.12.0
+    wagmi: ^2.19.2
+    "@wagmi/core": ^2.22.1

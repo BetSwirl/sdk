@@ -1,7 +1,7 @@
 {
   "name": "@betswirl/wagmi-provider",
   "description": "Wagmi client & wallet for Betswirl core SDK",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -37,18 +37,19 @@
     "web3"
   ],
   "peerDependencies": {
-    "@wagmi/core": ">=2.22.1"
+    "@betswirl/sdk-core": "workspace:*",
+    "@wagmi/core": "catalog:",
+    "viem": "catalog:"
   },
   "files": [
     "dist"
   ],
-  "dependencies": {
-    "@betswirl/sdk-core": "workspace:*",
-    "viem": "catalog:"
-  },
   "devDependencies": {
+    "@betswirl/sdk-core": "workspace:*",
+    "@wagmi/core": "catalog:",
     "cross-env": "^7.0.3",
     "rimraf": "^6.0.1",
-    "tsup": "^8.3.6"
+    "tsup": "^8.3.6",
+    "viem": "catalog:"
   }
 }
