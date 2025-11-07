@@ -2,6 +2,10 @@
 
 A provider allowing to use **@betswirl/sdk-core** through a Wagmi client.
 
+## Documentation
+
+- [Wagmi provider documentation](https://docs.betswirl.com/developer-hub/sdks/wagmi-provider/getting-started)
+
 ## Installation
 
 ```bash

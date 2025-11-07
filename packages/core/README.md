@@ -2,6 +2,9 @@
 
 VanillaJS library to use Betswirl protocol
 
+## Documentation
+- [SDK Core documentation](https://docs.betswirl.com/developer-hub/sdks/core/getting-started)
+
 ## Installation
 
 ```bash

@@ -20,7 +20,6 @@ import {
 import type {
   Abi,
   Account,
-  Address,
   CallReturnType,
   Hash,
   PublicClient,

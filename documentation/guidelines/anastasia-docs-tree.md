@@ -73,12 +73,12 @@
     │   ├── What can I build? (3 use cases)
     │   ├── Prerequisites (wallet, npm, etc)
     │   └── Choose your path:
-    │       ├── → Fork MiniApp (fastest)
+    │       ├── → Fork Mini App (fastest)
     │       ├── → Build React App 
     │       └── → Use Core SDK (advanced)
     │
     ├── 🎯 Quick Starts [🔴 PRIORITY 1]
-    │   ├── MiniApp in 5 minutes
+    │   ├── Mini App in 5 minutes
     │   ├── React App in 10 minutes
     │   └── First Bet in 3 minutes
     │
@@ -125,7 +125,7 @@
     │
     ├── 🏗️ Examples [🟢 PRIORITY 3]
     │   ├── Full Applications
-    │   │   ├── MiniApp Template
+    │   │   ├── Mini App Template
     │   │   ├── React Dashboard
     │   │   └── Telegram Bot
     │   │

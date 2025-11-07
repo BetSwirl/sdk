@@ -4,13 +4,14 @@
 
 The goal of this repo is to give developers some tools to interact easily with the protocol. 
 
-Feel free to reach us via [Discord](https://discord.gg/uAJXn4GJdX) or [Telegram](https://t.me/betswirl) if you need **support**!
+Feel free to reach us via [Discord](https://discord.gg/uAJXn4GJdX) or [Telegram](https://t.me/betswirl_affiliates) if you need **support**!
 
+[Documentation website](https://docs.betswirl.com)
 
 ## General
 
-### Dictionary
-We highly suggest you to read the [dictionary](/documentation/dictionary.md) to familiarize yourself with the terms used in the protocol before to start using it.
+### Glossary
+We highly suggest you to read the [glossary](https://docs.betswirl.com/developer-hub/glossary) to familiarize yourself with the terms used in the protocol before to start using it.
 
 ### Networks
 - **Arbitrum**

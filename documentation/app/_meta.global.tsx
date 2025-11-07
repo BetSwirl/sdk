@@ -177,6 +177,14 @@ const meta = {
                 title: "🚀 Getting Started",
               },
             },
+          },
+          "ui-react": {
+            title: "UI React",
+            items: {
+              "getting-started": {
+                title: "🚀 Getting Started",
+              },
+            },
           }
         },
       },
@@ -208,9 +216,6 @@ const meta = {
           },
           "node-cli": {
             title: "Node CLI",
-          },
-          react: {
-            title: "React dApp"
           }
         },
       },
