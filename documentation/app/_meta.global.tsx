@@ -99,7 +99,7 @@ const meta = {
         title: "⏱️ Quick Starts",
         items: {
           miniapp: {
-            title: "Your MiniApp in 1h",
+            title: "Your Farcaster Mini App in 1h",
           },
           react: {
             title: "Your React App in 1h",
@@ -177,20 +177,45 @@ const meta = {
                 title: "🚀 Getting Started",
               },
             },
+          },
+          "ui-react": {
+            title: "UI React",
+            items: {
+              "getting-started": {
+                title: "🚀 Getting Started",
+              },
+            },
           }
         },
       },
       demos: {
         title: "▶️ Demos",
         items: {
-          miniapp: {
-            title: "MiniApp",
+          "ui-react": {
+            title: "UI React",
+            items: {
+              react: {
+                title: "🚀 React dApp",
+              },
+              miniapp: {
+                title: "🚀 Farcaster Mini App",
+              },
+              "add-chain": {
+                title: "Add a Chain",
+              },
+              "checking-available-tokens": {
+                title: "Check Available Tokens",
+              },
+              configuration: {
+                title: "Configuration",
+              },
+              "hosted-manifest-guide": {
+                title: "Hosted Manifest Guide",
+              },
+            },
           },
           "node-cli": {
             title: "Node CLI",
-          },
-          react: {
-            title: "React dApp"
           }
         },
       },

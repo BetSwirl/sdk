@@ -12,15 +12,16 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 
 ## Quick Start
 
-🚀 **Build a Web3 casino with just 20 lines of React code!**
+🚀 **Build a Web3 casino dApp with just few lines of React code!**
 
-* 📖 [React Integration Guide](https://github.com/BetSwirl/sdk/blob/main/packages/ui-react/docs/react-guide.md) - Step-by-step tutorial
-* 🎮 [Live Demo](https://ui-react-demo.vercel.app) - See it in action ([source code](https://github.com/BetSwirl/ui-react-demo))
-* 🎨 [Storybook](http://demo.betswirl-sdk.chainhackers.xyz/) - Explore all components interactively
+* 📖 [Create your React dApp](https://docs.betswirl.com/developer-hub/demos/ui-react/react) - Step-by-step tutorial
+* 🎮 [Live Demo](https://ui-react-demo.betswirl.com/) - See it in action ([source code](https://github.com/BetSwirl/ui-react-demo))
+* 🎨 [Storybook](https://ui-react-storbybook.betswirl.com) - Explore all components interactively
 
-🪐 **Create a Farcaster Mini App with BetSwirl game**
+🪐 **Create a casino Farcaster Mini App with BetSwirl games**
 
-* 📖 [Farcaster Integration Guide](https://github.com/BetSwirl/sdk/blob/main/packages/ui-react/docs/farcaster-miniapp-guide.md)
+* 📖 [Create your Mini App](https://docs.betswirl.com/developer-hub/demos/ui-react/miniapp)
+TODO replace url below
 * 🎮 [Live Demo](https://miniapp-ui-react-demo.vercel.app) - See it in action ([source code](https://github.com/BetSwirl/miniapp-ui-react-demo))
 
 ## Installation

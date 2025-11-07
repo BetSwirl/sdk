@@ -548,9 +548,9 @@ export async function getPlacedBetFromReceipt(
     .map((log) => {
       try {
         return decodeEventLog<typeof coinTossAbi>({
-          //@ts-ignore coinTossAbi is used because PlaceBet event is the same for all games (expect input param)
+          //@ts-expect-error coinTossAbi is used because PlaceBet event is the same for all games (expect input param)
           abi: casinoChain.contracts.games[game]?.abi!,
-          //@ts-ignore
+          //@ts-expect-error
           data: log.data,
           topics: log.topics,
         });

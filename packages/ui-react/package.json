@@ -65,12 +65,12 @@
   "peerDependencies": {
     "@betswirl/sdk-core": "workspace:*",
     "@betswirl/wagmi-provider": "workspace:*",
-    "@coinbase/onchainkit": "^0.38.15",
+    "@coinbase/onchainkit": "^1.1.1",
     "@tanstack/react-query": "^5.81.5",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
     "viem": "catalog:",
-    "wagmi": "^2.15.6"
+    "wagmi": "^2.16.3"
   },
   "devDependencies": {
     "@betswirl/wagmi-provider": "workspace:*",

@@ -19,6 +19,7 @@ import {
 } from "@wagmi/core";
 import type {
   Abi,
+  Account,
   CallReturnType,
   Hash,
   PublicClient,
@@ -41,9 +42,9 @@ export class WagmiBetSwirlWallet extends BetSwirlWallet {
 
   // Wagmi currently does not support hosting Private Key & Mnemonic Accounts to the top-level Wagmi Config – meaning we have to explicitly pass through the account to every Action
   // If at least one connector exists, then do not return an account
-  getAccount(chainId?: number) {
+  getAccount(chainId?: number): Account | undefined {
     if (this.wagmiConfig.connectors.length > 0) return undefined;
-    return this.wagmiConfig.getClient({ chainId }).account;
+    return this.wagmiConfig.getClient({ chainId }).account as Account | undefined;
   }
 
   getPublicClient(chainId?: number) {
