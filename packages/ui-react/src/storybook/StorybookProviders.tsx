@@ -41,7 +41,7 @@ interface StorybookProvidersProps {
   token?: TokenWithImage
 }
 
-export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookProvidersProps) {
+export function StorybookProviders({ children }: StorybookProvidersProps) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
 
   // Get RPC URLs for each chain, fallback to public RPCs if not configured
@@ -81,7 +81,6 @@ export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookPro
           <BetSwirlSDKProvider
             initialChainId={DEFAULT_CHAIN.id}
             affiliate={affiliate}
-            bankrollToken={token}
             supportedChains={CHAINS.map((c) => c.id as CasinoChainId)}
             withExternalBankrollFreebets={true}
             testMode={false}

@@ -1,12 +1,10 @@
 import { type CasinoChainId, casinoChainById } from "@betswirl/sdk-core"
 import { createContext, useContext, useMemo } from "react"
 import { Address } from "viem"
-import type { TokenWithImage } from "../types/types"
 import { useChain } from "./chainContext"
 
 export type ConfigContextValue = {
   affiliates: Address[]
-  bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
   withExternalBankrollFreebets?: boolean
   testMode: boolean
@@ -24,7 +22,6 @@ export const useBettingConfig = () => {
 export type ConfigProviderProps = {
   children: React.ReactNode
   affiliate?: Address
-  bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
   withExternalBankrollFreebets?: boolean
   testMode?: boolean
@@ -34,7 +31,6 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
   const {
     children,
     affiliate: userAffiliate,
-    bankrollToken,
     filteredTokens,
     withExternalBankrollFreebets = false,
     testMode = false,
@@ -76,20 +72,12 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
   const context: ConfigContextValue = useMemo(
     () => ({
       affiliates,
-      bankrollToken,
       filteredTokens,
       withExternalBankrollFreebets,
       testMode,
       getAffiliateForChain,
     }),
-    [
-      affiliates,
-      bankrollToken,
-      filteredTokens,
-      withExternalBankrollFreebets,
-      testMode,
-      getAffiliateForChain,
-    ],
+    [affiliates, filteredTokens, withExternalBankrollFreebets, testMode, getAffiliateForChain],
   )
 
   return <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>

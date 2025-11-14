@@ -1,5 +1,11 @@
 # @betswirl/ui-react
 
+## 0.2.9
+
+### Patch Changes
+
+- Remove bankrollProvider from BetSwirlSDKProvider
+
 ## 0.2.8
 
 ### Patch Changes

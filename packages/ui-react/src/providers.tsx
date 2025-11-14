@@ -6,11 +6,13 @@ import { createConfig, WagmiProvider } from "wagmi"
 // Import mainnet chains
 // Import testnet chains
 import {
+  arbitrum,
   arbitrumSepolia,
   avalanche,
   avalancheFuji,
   base,
   baseSepolia,
+  bsc,
   polygon,
   polygonAmoy,
 } from "wagmi/chains"
@@ -28,7 +30,7 @@ interface AppProvidersProps {
 }
 
 // Define supported chains lists
-const MAINNET_CHAINS = [base, polygon, avalanche] as const
+const MAINNET_CHAINS = [base, polygon, avalanche, arbitrum, bsc] as const
 const TESTNET_CHAINS = [baseSepolia, polygonAmoy, avalancheFuji, arbitrumSepolia] as const
 
 const queryClient = new QueryClient({
@@ -61,6 +63,8 @@ export function AppProviders({ children, onLeaderboardPlayNow }: AppProvidersPro
     [avalanche.id]: http(
       import.meta.env.VITE_AVALANCHE_RPC_URL || "https://api.avax.network/ext/bc/C/rpc",
     ),
+    [arbitrum.id]: http(import.meta.env.VITE_ARBITRUM_RPC_URL || "https://arb1.arbitrum.io/rpc"),
+    [bsc.id]: http(import.meta.env.VITE_BSC_RPC_URL || "https://bsc-dataseed1.bnbchain.org"),
     // Testnet chains
     [baseSepolia.id]: http(import.meta.env.VITE_BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org"),
     [polygonAmoy.id]: http(

@@ -14,6 +14,7 @@ import {
 import { type UseQueryResult, useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
 import { useAccount } from "wagmi"
+import { useBettingConfig } from "../context/configContext"
 import { useTokenContext } from "../context/tokenContext"
 import { createLogger } from "../lib/logger"
 import { getTokenImage, toLowerCase } from "../lib/utils"
@@ -76,8 +77,7 @@ export const useGameHistory: UseGameHistory = ({ gameType, filter, offset, limit
   const { allTokens: tokens } = useTokenContext()
   const address = filter.userAddress || activeAddress
   const chainId = filter.userChainId || activeChainId
-  // I think affiliate should be accesible from a React context
-  //const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Address
+  const { getAffiliateForChain } = useBettingConfig()
 
   return useQuery({
     queryKey: [
@@ -102,7 +102,7 @@ export const useGameHistory: UseGameHistory = ({ gameType, filter, offset, limit
           game: gameType,
           token: filter.token,
           status: filter.status,
-          //affiliates: [affiliate], To uncomment when we have a way to get the affiliate address from the context
+          affiliates: [getAffiliateForChain(chainId as CasinoChainId)],
         },
         offset,
         limit,

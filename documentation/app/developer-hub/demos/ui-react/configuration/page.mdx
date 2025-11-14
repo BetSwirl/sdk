@@ -66,28 +66,6 @@ const affiliateAddress = process.env.NEXT_PUBLIC_AFFILIATE_ADDRESS
 <BetSwirlSDKProvider affiliate={affiliateAddress}>
 ```
 
-### `bankrollToken`
-
-**What it does:** Sets which token is selected by default when the game loads.
-
-**Accepted values:** A `TokenWithImage` object with these properties:
-- `address` - Token contract address (use `0x0000...0000` for native token like ETH)
-- `symbol` - Token name (e.g., "ETH", "DEGEN", "USDC")
-- `decimals` - Usually 18 (or 6 for USDC)
-- `image` - URL to token icon
-
-**Example:**
-```tsx
-const DEGEN_TOKEN = {
-  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
-  symbol: "DEGEN",
-  decimals: 18,
-  image: "https://www.betswirl.com/img/tokens/DEGEN.svg"
-}
-
-<BetSwirlSDKProvider bankrollToken={DEGEN_TOKEN}>
-```
-
 ### `filteredTokens`
 
 **What it does:** Limits which tokens users can select for betting. Without this, all supported tokens will be available.
