@@ -39,10 +39,10 @@ npm install
 cp .env.example .env
 ```
 
-You can fill `.env` now or leave it empty - how to configure affiliate address and custom RPC is explained below in [Add Affiliate & Custom RPC](#add-affiliate--custom-rpc) section.
+You can fill `.env` now or leave it empty - how to configure affiliate address and custom RPC is explained below in [Add your affiliate address & custom RPCs](#add-affiliate--custom-rpc) section.
 
 ```shell
-# Start dev server
+# Start dev server (your .env file must be empty or configured to make it working)
 npm run dev
 ```
 
@@ -71,13 +71,13 @@ Stop the dev server (Ctrl+C) and navigate to the project directory:
 cd betswirl-ui-react-demo
 ```
 
-#### Step 2: Install BetSwirl
+#### Step 2: Install BetSwirl UI React sdk
 
 ```shell
 npm i @betswirl/ui-react
 ```
 
-Package: [@betswirl/ui-react on npm](https://www.npmjs.com/package/@betswirl/ui-react)
+NPM package: [@betswirl/ui-react on npm](https://www.npmjs.com/package/@betswirl/ui-react)
 
 #### Step 3: Setup Providers
 
@@ -109,6 +109,8 @@ const queryClient = new QueryClient()
 const baseRpc = import.meta.env.VITE_BASE_RPC_URL
 const polygonRpc = import.meta.env.VITE_POLYGON_RPC_URL
 const arbitrumRpc = import.meta.env.VITE_ARBITRUM_RPC_URL
+const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS
+const testMode = import.meta.env.VITE_TEST_MODE == 'true'
 
 const config = createConfig({
   chains: [base, polygon, arbitrum],
@@ -125,28 +127,14 @@ const onChainKitConfig: AppConfig = {
   }
 }
 
-// Token definitions (you can add more or use different tokens)
-const DEGEN_TOKEN: TokenWithImage = {
-  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
-  symbol: "DEGEN",
-  decimals: 18,
-  image: "https://www.betswirl.com/img/tokens/DEGEN.svg"
-}
 
-const ETH_TOKEN: TokenWithImage = {
-  address: "0x0000000000000000000000000000000000000000" as Hex,
-  symbol: "ETH",
-  decimals: 18,
-  image: "https://www.betswirl.com/img/tokens/ETH.svg"
-}
-
-// Limit available tokens (remove this to show all supported tokens)
+// Optional: Limit available tokens to specific ones
 const ALLOWED_TOKENS = [
-  DEGEN_TOKEN.address,
-  ETH_TOKEN.address,
-  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as Hex, // USDC
-  "0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5" as Hex, // BETS
-]
+  "0x0000000000000000000000000000000000000000", // gas token on all chains
+  "0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5", // BETS on all chains
+  "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed", // DEGEN ton Base
+  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC on Base
+] as Hex[]
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -154,10 +142,12 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider chain={base} config={onChainKitConfig}>
           <BetSwirlSDKProvider
-            initialChainId={base.id}
-            supportedChains={[base.id, polygon.id, arbitrum.id]}
-            bankrollToken={DEGEN_TOKEN}     // Optional: set default betting token
-            filteredTokens={ALLOWED_TOKENS} // Optional: limit available tokens
+            initialChainId={base.id} // set the initial chain
+            supportedChains={[base.id, polygon.id, arbitrum.id]} // limit supported chains
+            filteredTokens={ALLOWED_TOKENS} // Optional: limit available tokens, let empty if you want to show all tokens
+            affiliate={affiliateAddress} // important to set to be able to receive your affiliate rewards
+            testMode={testMode} // Optional: set to true to enable test mode
+            withExternalBankrollFreebets={true} // Optional: enable your users to use freebets created by bankroll providers on your app
           >
             <TokenProvider>
               <BalanceProvider>
@@ -206,7 +196,7 @@ Download [`.env.example`](https://github.com/BetSwirl/ui-react-demo/blob/main/.e
 cp .env.example .env
 ```
 
-You can fill `.env` now or leave it empty - how to configure affiliate address and custom RPC is explained below in [Add Affiliate & Custom RPC](#add-affiliate--custom-rpc) section.
+You can fill `.env` now or leave it empty - how to configure affiliate address and custom RPC is explained below in [Add your affiliate address & custom RPCs](#add-affiliate--custom-rpc) section.
 
 You can test it now:
 
@@ -220,13 +210,13 @@ Open `http://localhost:5173` to connect wallet and place bets.
 
 Add your affiliate address to earn **30% of house edge revenue** from every bet placed through your app.
 
-Update `src/main.tsx` - add this line at the top with other environment variables:
+Update `src/main.tsx` - add this line at the top with other environment variables if you don't have it already:
 
 ```tsx
 const affiliateAddress = import.meta.env.VITE_AFFILIATE_ADDRESS as `0x${string}` | undefined
 ```
 
-Then add `affiliate` prop to `BetSwirlSDKProvider`:
+Ensure you have `affiliate` prop to `BetSwirlSDKProvider`:
 
 ```tsx
 <BetSwirlSDKProvider
@@ -266,9 +256,10 @@ Replace the entire file with:
 ```tsx
 import { useState } from 'react'
 import { CoinTossGame, DiceGame, RouletteGame } from '@betswirl/ui-react'
+import { CASINO_GAME_TYPE, labelCasinoGameByType } from '@betswirl/sdk-core'
 
 function App() {
-  const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+  const [game, setGame] = useState<CASINO_GAME_TYPE>(CASINO_GAME_TYPE.DICE)
 
   return (
     <div>
@@ -279,26 +270,28 @@ function App() {
         padding: '12px 0',
         marginBottom: '12px',
       }}>
-        {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
-          <button
-            key={g}
-            onClick={() => setGame(g)}
-            disabled={game === g}
-          >
-            {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
-          </button>
-        ))}
+          {([CASINO_GAME_TYPE.DICE, CASINO_GAME_TYPE.COINTOSS, CASINO_GAME_TYPE.ROULETTE] as const).map((g) => (
+            <button
+              key={g}
+              onClick={() => setGame(g)}
+              disabled={game === g}
+            >
+              {labelCasinoGameByType[g]}
+            </button>
+          ))}
       </nav>
 
-      {game === 'dice' && <DiceGame />}
-      {game === 'cointoss' && <CoinTossGame />}
-      {game === 'roulette' && <RouletteGame />}
+        {game === CASINO_GAME_TYPE.DICE && <DiceGame />}
+        {game === CASINO_GAME_TYPE.COINTOSS && <CoinTossGame />}
+        {game === CASINO_GAME_TYPE.ROULETTE && <RouletteGame />}
     </div>
   )
 }
 
 export default App
 ```
+
+See [Step 8.3: Custom Branding](#step-8-custom-branding) to improve the design of the buttons.
 
 #### Step 7: Leaderboard Integration (Optional)
 
@@ -316,8 +309,6 @@ import { type PlayNowEvent } from '@betswirl/ui-react'
   // TODO: Implement game switching based on your app architecture
 }}>
 ```
-
-**Learn more:** [Leaderboard Integration](../configuration#leaderboard-integration)
 
 #### Step 8: Custom Branding
 
@@ -348,7 +339,7 @@ Add custom theme and background image props.
 
 ```tsx
 function App() {
-  const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+  const [game, setGame] = useState<CASINO_GAME_TYPE>(CASINO_GAME_TYPE.DICE)
 
   const gameProps = {
     theme: "dark" as const,
@@ -364,16 +355,16 @@ function App() {
 
 Change from:
 ```tsx
-{game === 'dice' && <DiceGame />}
-{game === 'cointoss' && <CoinTossGame />}
-{game === 'roulette' && <RouletteGame />}
+{game === CASINO_GAME_TYPE.DICE && <DiceGame />}
+{game === CASINO_GAME_TYPE.COINTOSS && <CoinTossGame />}
+{game === CASINO_GAME_TYPE.ROULETTE && <RouletteGame />}
 ```
 
 To:
 ```tsx
-{game === 'dice' && <DiceGame {...gameProps} />}
-{game === 'cointoss' && <CoinTossGame {...gameProps} />}
-{game === 'roulette' && <RouletteGame {...gameProps} />}
+{game === CASINO_GAME_TYPE.DICE && <DiceGame {...gameProps}  />}
+{game === CASINO_GAME_TYPE.COINTOSS && <CoinTossGame {...gameProps} />}
+{game === CASINO_GAME_TYPE.ROULETTE && <RouletteGame {...gameProps} />}
 ```
 
 **Your complete `src/App.tsx` should look like this:**
@@ -381,9 +372,10 @@ To:
 ```tsx
 import { useState } from 'react'
 import { CoinTossGame, DiceGame, RouletteGame } from '@betswirl/ui-react'
+import { CASINO_GAME_TYPE, labelCasinoGameByType } from '@betswirl/sdk-core'
 
 function App() {
-  const [game, setGame] = useState<'dice' | 'cointoss' | 'roulette'>('dice')
+  const [game, setGame] = useState<CASINO_GAME_TYPE>(CASINO_GAME_TYPE.DICE)
 
   const gameProps = {
     theme: "dark" as const,
@@ -403,20 +395,20 @@ function App() {
         padding: '12px 0',
         marginBottom: '12px',
       }}>
-        {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+        {([CASINO_GAME_TYPE.DICE, CASINO_GAME_TYPE.COINTOSS, CASINO_GAME_TYPE.ROULETTE] as const).map((g) => (
           <button
             key={g}
             onClick={() => setGame(g)}
             disabled={game === g}
           >
-            {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+            {labelCasinoGameByType[g]}
           </button>
         ))}
       </nav>
 
-      {game === 'dice' && <DiceGame {...gameProps} />}
-      {game === 'cointoss' && <CoinTossGame {...gameProps} />}
-      {game === 'roulette' && <RouletteGame {...gameProps} />}
+    {game === CASINO_GAME_TYPE.DICE && <DiceGame {...gameProps}  />}
+    {game === CASINO_GAME_TYPE.COINTOSS && <CoinTossGame {...gameProps} />}
+    {game === CASINO_GAME_TYPE.ROULETTE && <RouletteGame {...gameProps} />}
     </div>
   )
 }
@@ -436,7 +428,7 @@ Replace the `<nav>` section in `src/App.tsx` with custom styled buttons:
   padding: '12px 0',
   marginBottom: '12px',
 }}>
-  {(['dice', 'cointoss', 'roulette'] as const).map((g) => (
+  {([CASINO_GAME_TYPE.DICE, CASINO_GAME_TYPE.COINTOSS, CASINO_GAME_TYPE.ROULETTE] as const).map((g) => (
     <button
       key={g}
       onClick={() => setGame(g)}
@@ -452,7 +444,7 @@ Replace the `<nav>` section in `src/App.tsx` with custom styled buttons:
         outline: 'none',
       }}
     >
-      {g === 'cointoss' ? 'Coin Toss' : g.charAt(0).toUpperCase() + g.slice(1)}
+      {labelCasinoGameByType[g]}
     </button>
   ))}
 </nav>
@@ -533,14 +525,14 @@ Replace `YOUR_USERNAME` with your GitHub username.
 
 Your React casino application is ready with the following features already configured:
 
-- BetSwirl SDK integration with support for Base, Polygon, and Arbitrum
+- BetSwirl SDK integration with support for Base, Polygon, Arbitrum, BSC and Avalanche
 - OnchainKit wallet connection
 - Fully functional Dice game component
 - Custom theming and branding with gold accents and dark theme
 - Background images for page and game
 - Freebet system for user promotions
 - Leaderboard support for competitive tournaments
-- Token selection with filtering for DEGEN, ETH, USDC, and BETS
+- Token selection with filtering for ETH, BETS, DEGEN and USDC
 
 **Next steps:** Deploy to Vercel and add your affiliate address to start earning 30% commission from all bets.
 
@@ -560,7 +552,7 @@ Now deploy your casino to the web and get a public URL.
 
 **What's next:** Every `git push` automatically deploys. GitHub now shows a "Deployments" tab with deployment history and status checks.
 
-## Add Affiliate & Custom RPC
+## Add your affiliate address & custom RPCs
 
 As an affiliate, you earn **30% of house edge revenue** from every bet placed through your casino. Add your wallet address to start earning, and configure custom RPC endpoints for better performance.
 
@@ -583,20 +575,23 @@ As an affiliate, you earn **30% of house edge revenue** from every bet placed th
 | `VITE_BASE_RPC_URL` | Your Base RPC URL |
 | `VITE_POLYGON_RPC_URL` | Your Polygon RPC URL |
 | `VITE_ARBITRUM_RPC_URL` | Your Arbitrum RPC URL |
+| `VITE_BSC_RPC_URL` | Your BSC RPC URL |
+| `VITE_AVALANCHE_RPC_URL` | Your Avalanche RPC URL |
 
 **RPC providers:** [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/), [QuickNode](https://www.quicknode.com/) (most offer free tiers)
+
+
+- **Optional:** Enable test mode (for testing on testnet chains):
+
+| Name | Value |
+|------|-------|
+| `VITE_TEST_MODE` | `true` or `false` |
 
 Click **"Save"** after adding variables.
 
 **2. Deploy changes:**
 
-```bash
-git add .
-git commit -m "feat: add affiliate and custom rpc"
-git push
-```
-
-Vercel will automatically redeploy with your affiliate address and RPC endpoints.
+Once you saved the new environment variables, Vercel will automatically ask you to redeploy the project.
 
 **3. Check your earnings:**
 
@@ -609,24 +604,21 @@ Once deployed, track your affiliate revenue:
 
 ---
 
+
 ## Optional Enhancements
 
 The base setup above gives you a fully functional casino. Below are optional features you can add to enhance your application.
 
 
----
-
-## Documentation
-
 - [How to Add Multiple Games](#step-6-add-multiple-games) - Switch between Dice, CoinToss, Roulette and more
-- [How to Add a Chain](../add-chain) - Add or change supported blockchain networks
-- [How to Check Available Tokens](../checking-available-tokens)
-- [Configuration Reference](../configuration) - All BetSwirlSDKProvider parameters, Leaderboard Integration, Custom Branding
+- [How to Add a Chain](./add-chain) - Add or change supported blockchain networks
+- [How to Check Available Tokens](./checking-available-tokens) - Check which tokens are available for betting
+- [Configuration Reference](./configuration) - All BetSwirlSDKProvider parameters, Leaderboard Integration, Custom Branding
 
 ---
 
 ## Example Result
 
-* **GitHub Repository**: [github.com/BetSwirl/betswirl-ui-react-demo](https://github.com/BetSwirl/betswirl-ui-react-demo)
+* **Demo Github repository**: [github.com/BetSwirl/betswirl-ui-react-demo](https://github.com/BetSwirl/ui-react-demo)
 * **Live Demo**: [ui-react-demo.betswirl.com](https://ui-react-demo.betswirl.com/)
 

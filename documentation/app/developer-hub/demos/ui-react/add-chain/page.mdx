@@ -65,20 +65,18 @@ VITE_BSC_RPC_URL=https://bsc-mainnet.g.alchemy.com/v2/your-api-key
 In `app/rootProvider.tsx`:
 
 ```tsx
-import { base, polygon, arbitrum, avalanche, bsc } from "wagmi/chains"
+import { base, arbitrum, bsc } from "wagmi/chains"
 ```
 
 **2. Add the chain to your config**
 
 ```tsx
-const CHAINS = [base, polygon, arbitrum, avalanche, bsc] as const
+const CHAINS = [base, arbitrum, bsc] as const
 const SUPPORTED_CHAIN_IDS = CHAINS.map((chain) => chain.id)
 
 const TRANSPORTS = {
   [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || undefined),
-  [polygon.id]: http(process.env.NEXT_PUBLIC_POLYGON_RPC_URL || undefined),
   [arbitrum.id]: http(process.env.NEXT_PUBLIC_ARBITRUM_RPC_URL || undefined),
-  [avalanche.id]: http(process.env.NEXT_PUBLIC_AVALANCHE_RPC_URL || undefined),
   [bsc.id]: http(process.env.NEXT_PUBLIC_BSC_RPC_URL || undefined),
 }
 
