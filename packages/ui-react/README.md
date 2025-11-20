@@ -16,13 +16,12 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 
 * 📖 [Create your React dApp](https://docs.betswirl.com/developer-hub/demos/ui-react/react) - Step-by-step tutorial
 * 🎮 [Live Demo](https://ui-react-demo.betswirl.com/) - See it in action ([source code](https://github.com/BetSwirl/ui-react-demo))
-* 🎨 [Storybook](https://ui-react-storbybook.betswirl.com) - Explore all components interactively
+* 🎨 [Storybook](https://ui-react-storybook.betswirl.com) - Explore all components interactively
 
 🪐 **Create a casino Farcaster Mini App with BetSwirl games**
 
 * 📖 [Create your Mini App](https://docs.betswirl.com/developer-hub/demos/ui-react/miniapp)
-TODO replace url below
-* 🎮 [Live Demo](https://miniapp-ui-react-demo.vercel.app) - See it in action ([source code](https://github.com/BetSwirl/miniapp-ui-react-demo))
+* 🎮 [Live Demo](https://farcaster.xyz/miniapps/M926rOlymYrS/betswirl-mini-app-demo) - See it in action ([source code](https://github.com/BetSwirl/miniapp-ui-react-demo))
 
 ## Installation
 

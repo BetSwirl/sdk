@@ -101,9 +101,6 @@ const meta = {
           miniapp: {
             title: "Your Farcaster Mini App in 1h",
           },
-          react: {
-            title: "Your React App in 1h",
-          },
         },
       },
       guides: {
@@ -207,7 +204,7 @@ const meta = {
                 title: "Check Available Tokens",
               },
               configuration: {
-                title: "Configuration",
+                title: "BetSwirlSDKProvider",
               },
               "hosted-manifest-guide": {
                 title: "Hosted Manifest Guide",
@@ -225,7 +222,7 @@ const meta = {
     title: "Community Updates",
     type: "page",
     items: {
-      test: "Test",
+      "affiliate-launch": "Affiliate Launch",
     },
   },
 };

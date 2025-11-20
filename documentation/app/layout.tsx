@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const banner = (
-  <Banner storageKey="affiliate-released">BetSwirl Affliate program is released soon 🎉</Banner>
+  <Banner storageKey="affiliate-released">BetSwirl Affliate program is released 🎉</Banner>
 );
 const navbar = (
   <Navbar

@@ -1,4 +1,4 @@
-# Configuration Reference
+# BetSwirlSDKProvider Configuration Reference
 
 This guide explains all parameters you can configure in `BetSwirlSDKProvider`.
 
@@ -83,6 +83,50 @@ const ALLOWED_TOKENS = [
 ]
 
 <BetSwirlSDKProvider filteredTokens={ALLOWED_TOKENS}>
+```
+
+### `withExternalBankrollFreebets`
+
+**What it does:** Enables leaderboards from external bankroll providers and exposes their available freebets inside your app so players can join more campaigns.
+
+**Accepted values:** Boolean
+
+**Recommended value:** `true` so users can claim more freebets and access a broader set of leaderboards.
+
+**Example for React (Vite):**
+```tsx
+const bankrollFreebetsEnabled = import.meta.env.VITE_WITH_EXTERNAL_BANKROLL_FREEBETS === 'true'
+
+<BetSwirlSDKProvider withExternalBankrollFreebets={bankrollFreebetsEnabled}>
+```
+
+**Example for Next.js:**
+```tsx
+const bankrollFreebetsEnabled = process.env.NEXT_PUBLIC_WITH_EXTERNAL_BANKROLL_FREEBETS === 'true'
+
+<BetSwirlSDKProvider withExternalBankrollFreebets={bankrollFreebetsEnabled}>
+```
+
+### `testMode`
+
+**What it does:** Lets you consume freebets generated in the BetSwirl test environment.
+
+**Accepted values:** Boolean
+
+**Recommended value:** `false` unless you explicitly need to validate test-environment freebets.
+
+**Example for React (Vite):**
+```tsx
+const testMode = import.meta.env.VITE_TEST_MODE === 'true'
+
+<BetSwirlSDKProvider testMode={testMode}>
+```
+
+**Example for Next.js:**
+```tsx
+const testMode = process.env.NEXT_PUBLIC_TEST_MODE === 'true'
+
+<BetSwirlSDKProvider testMode={testMode}>
 ```
 
 ## Leaderboard Integration
