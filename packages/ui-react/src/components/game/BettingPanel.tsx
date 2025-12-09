@@ -436,7 +436,6 @@ export function BettingPanel({
               // Small delay to ensure sheet closes before opening wallet modal
               setTimeout(() => setIsWalletModalOpen(true), 100)
             }}
-            //onClaimCode={(code) => console.log("Claiming code:", code)} // TODO: Freebets code claim
           />
         )}
       </Sheet>

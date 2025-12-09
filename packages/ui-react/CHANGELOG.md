@@ -1,5 +1,11 @@
 # @betswirl/ui-react
 
+## 0.2.10
+
+### Patch Changes
+
+- Add claim freebet code
+
 ## 0.2.9
 
 ### Patch Changes

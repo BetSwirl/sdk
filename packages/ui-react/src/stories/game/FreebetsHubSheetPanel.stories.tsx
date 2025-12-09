@@ -188,17 +188,10 @@ const FreebetsHubSheetWithWrapper = ({
   theme?: Theme
 }) => {
   const [isOpen, setIsOpen] = useState(true)
-  //const [claimedCodes, setClaimedCodes] = useState<string[]>([]) // TODO: Freebets code claim
 
   const handleConnectWallet = () => {
     console.log("Connect wallet clicked")
   }
-
-  // TODO: Freebets code claim
-  // const handleClaimCode = (code: string) => {
-  //   console.log("Claim code:", code)
-  //   setClaimedCodes([...claimedCodes, code])
-  // }
 
   const handleSelectFreebet = (freebet: SignedFreebet) => {
     console.log("Select freebet: ", freebet)
@@ -223,7 +216,6 @@ const FreebetsHubSheetWithWrapper = ({
               isConnected={isConnected}
               freebets={freebets as unknown as SignedFreebet[]}
               onConnectWallet={handleConnectWallet}
-              //onClaimCode={handleClaimCode} // TODO: Freebets code claim
               onSelectFreebet={handleSelectFreebet as any}
             />
           </Sheet>
