@@ -10,6 +10,7 @@ interface PromoCodeInputProps {
   error?: string | null
   placeholder?: string
   isDisabled?: boolean
+  isSuccess?: boolean
 }
 
 export function PromoCodeInput({
@@ -20,6 +21,7 @@ export function PromoCodeInput({
   error,
   placeholder = "Code",
   isDisabled = false,
+  isSuccess = false,
 }: PromoCodeInputProps) {
   const [isFocused, setIsFocused] = React.useState(false)
 
@@ -58,15 +60,15 @@ export function PromoCodeInput({
         />
       </div>
 
-      {/* Error message and character counter */}
+      {/* Error/Success message and character counter */}
       <div className="flex justify-between px-[6px]">
         <span
           className={cn(
             "text-[12px] leading-[16px]",
-            error ? "text-destructive" : "text-transparent",
+            error ? "text-destructive" : isSuccess ? "text-game-win" : "text-transparent",
           )}
         >
-          {error || " "}
+          {error || isSuccess ? "Freebet claimed successfully!" : " "}
         </span>
         <span className="text-[12px] leading-[16px] text-text-on-surface-variant">
           {value.length}/{maxLength}
